@@ -25,7 +25,7 @@ type Backend interface {
 	Size() mathi.Vec2
 	MousePosition() mathi.Vec2
 	MousePressed(key Key) bool
-	Set(pos mathi.Vec2, char rune)
+	Set(pos mathi.Vec2, char rune, fg, bg int32)
 	Render()
 }
 
@@ -33,7 +33,7 @@ func New[B Backend](backend B) *Timui[B] {
 	size := backend.Size()
 
 	front := newScreen(size)
-	front.clear(' ')
+	front.clear(' ', 0, 0)
 
 	tui := &Timui[B]{
 		backend: backend,
@@ -57,7 +57,8 @@ func (t *Timui[B]) Finish() {
 			pos := mathi.Vec2{X: x, Y: y}
 
 			if t.front.get(pos) != t.back.get(pos) {
-				t.backend.Set(pos, t.front.get(pos))
+				fc := t.front.get(pos)
+				t.backend.Set(pos, fc.char, fc.fg, fc.bg)
 			}
 		}
 	}
@@ -66,7 +67,7 @@ func (t *Timui[B]) Finish() {
 
 	// todo screen resizing
 	t.back = t.front
-	t.front.clear(' ')
+	t.front.clear(' ', 0, 0)
 
 	t.reset()
 }

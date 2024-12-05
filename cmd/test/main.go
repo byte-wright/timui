@@ -79,7 +79,7 @@ func main() {
 		tui.Label(fmt.Sprintf("Count %v", count))
 
 		panel.Header()
-		tui.Text("[ DATA ]", mathi.Vec2{})
+		tui.Text("[ DATA ]", mathi.Vec2{}, 0xff6666, 0x222222)
 
 		panel.Finish()
 
