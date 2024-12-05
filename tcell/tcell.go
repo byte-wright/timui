@@ -1,14 +1,17 @@
 package tcell
 
 import (
+	"github.com/byte-wright/timui"
 	"github.com/gdamore/tcell/v2"
 	_ "github.com/gdamore/tcell/v2/encoding"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
 type TCellBackend struct {
-	screen   tcell.Screen
-	mousePos mathi.Vec2
+	screen     tcell.Screen
+	mousePos   mathi.Vec2
+	leftMouse  bool
+	rightMouse bool
 }
 
 func NewBackend() (*TCellBackend, error) {
@@ -44,6 +47,22 @@ func (b *TCellBackend) Render() {
 	b.screen.Show()
 }
 
+func (b *TCellBackend) MousePosition() mathi.Vec2 {
+	return b.mousePos
+}
+
+func (b *TCellBackend) MousePressed(key timui.Key) bool {
+	if key == timui.MouseButtonLeft {
+		return b.leftMouse
+	}
+
+	if key == timui.MouseButtonRight {
+		return b.rightMouse
+	}
+
+	return false
+}
+
 func (b *TCellBackend) Events() bool {
 	exit := false
 
@@ -59,6 +78,11 @@ func (b *TCellBackend) Events() bool {
 		case *tcell.EventMouse:
 			x, y := evt.Position()
 			b.mousePos = mathi.Vec2{X: x, Y: y}
+
+			bmsk := evt.Buttons()
+
+			b.leftMouse = bmsk&tcell.Button1 == tcell.Button1
+			b.rightMouse = bmsk&tcell.Button2 == tcell.Button2
 		}
 	}
 

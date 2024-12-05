@@ -7,12 +7,24 @@ type Timui[B Backend] struct {
 	front   *screen
 	back    *screen
 
-	area      []mathi.Box2
-	idManager idManager
+	area []mathi.Box2
+
+	idManager         idManager
+	clipManager       clipManager
+	mouseInputManager mouseInputManager[B]
 }
+
+type Key int
+
+var (
+	MouseButtonLeft  Key = 1_000_000
+	MouseButtonRight Key = 1_000_001
+)
 
 type Backend interface {
 	Size() mathi.Vec2
+	MousePosition() mathi.Vec2
+	MousePressed(key Key) bool
 	Set(pos mathi.Vec2, char rune)
 	Render()
 }
@@ -28,8 +40,10 @@ func New[B Backend](backend B) *Timui[B] {
 		front:   front,
 		back:    newScreen(size),
 
-		area:      []mathi.Box2{},
-		idManager: *newIDManager(),
+		area:              []mathi.Box2{},
+		idManager:         *newIDManager(),
+		clipManager:       *newClipManager(),
+		mouseInputManager: *newMouseInputManager[B](),
 	}
 
 	tui.reset()
@@ -61,6 +75,8 @@ func (t *Timui[B]) Finish() {
 func (t *Timui[B]) reset() {
 	t.area = t.area[:]
 	t.area = append(t.area, mathi.Box2{To: t.backend.Size()})
+
+	t.mouseInputManager.finish(t)
 }
 
 func (t *Timui[B]) CurrentArea() *mathi.Box2 {

@@ -1,6 +1,8 @@
 package timui
 
-import "gitlab.com/bytewright/gmath/mathi"
+import (
+	"gitlab.com/bytewright/gmath/mathi"
+)
 
 var borderStyleDouble = [6]rune{'═', '║', '╔', '╗', '╚', '╝'}
 
