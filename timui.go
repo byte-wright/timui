@@ -1,6 +1,8 @@
 package timui
 
-import "gitlab.com/bytewright/gmath/mathi"
+import (
+	"gitlab.com/bytewright/gmath/mathi"
+)
 
 type Timui[B Backend] struct {
 	backend B
@@ -66,7 +68,7 @@ func (t *Timui[B]) Finish() {
 	t.backend.Render()
 
 	// todo screen resizing
-	t.back = t.front
+	t.back, t.front = t.front, t.back
 	t.front.clear(' ', 0, 0)
 
 	t.reset()

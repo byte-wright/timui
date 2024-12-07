@@ -19,13 +19,21 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to open stdout log file: %v", err)
 	}
-	defer stdoutFile.Close()
+	defaultStdout := os.Stdout
+	defer func() {
+		stdoutFile.Close()
+		os.Stdout = defaultStdout
+	}()
 
 	stderrFile, err := os.OpenFile("stderr.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		log.Fatalf("Failed to open stderr log file: %v", err)
 	}
-	defer stderrFile.Close()
+	defaultStderr := os.Stderr
+	defer func() {
+		stderrFile.Close()
+		os.Stderr = defaultStderr
+	}()
 
 	// Redirect stdout and stderr
 	os.Stdout = stdoutFile
@@ -44,7 +52,6 @@ func main() {
 	exit := func() {
 		backend.Exit()
 		fmt.Println("Exit...")
-		os.Exit(0)
 	}
 
 	defer exit()
@@ -52,6 +59,7 @@ func main() {
 	go func() {
 		<-signalChan
 		exit()
+		os.Exit(0)
 	}()
 
 	count := 100
@@ -68,13 +76,31 @@ func main() {
 		tui.Label("BBB")
 		tui.Label("CC")
 
+		cols := tui.Columns(timui.ByFactors([]float32{0.25, 0.25, 0.5, 1.5}).Pad(1))
+
 		if tui.Button("ClickMe +") {
 			count++
 		}
+		cols.Next()
 
 		if tui.Button("ClickMe -") {
 			count--
 		}
+		cols.Next()
+		if tui.Button("Exit") {
+			fmt.Println("no!")
+		}
+		cols.Next()
+		if tui.Button("Quit") {
+			fmt.Println("serioulsy!")
+		}
+		if tui.Button("Settings") {
+			fmt.Println("serioulsy!")
+		}
+		if tui.Button("Start") {
+			fmt.Println("serioulsy!")
+		}
+		cols.Finish()
 
 		tui.Label(fmt.Sprintf("Count %v", count))
 

@@ -8,7 +8,7 @@ func (t *Timui[B]) Text(name string, pos mathi.Vec2, fg, bg int32) {
 	p := t.CurrentArea().From.Add(pos)
 
 	for i, r := range []rune(name) {
-		t.backend.Set(p.Add(mathi.Vec2{X: i}), r, fg, bg)
+		t.front.set(p.Add(mathi.Vec2{X: i}), r, fg, bg)
 	}
 }
 
