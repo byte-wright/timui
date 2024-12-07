@@ -38,8 +38,8 @@ func NewBackend() (*TCellBackend, error) {
 	}, nil
 }
 
-func (b *TCellBackend) Set(pos mathi.Vec2, char rune, fg, bg int32) {
-	st := tcell.StyleDefault.Foreground(tcell.NewHexColor(fg)).Background(tcell.NewHexColor(bg))
+func (b *TCellBackend) Set(pos mathi.Vec2, char rune, fg, bg uint32) {
+	st := tcell.StyleDefault.Foreground(tcell.NewHexColor(int32(fg))).Background(tcell.NewHexColor(int32(bg)))
 	b.screen.SetContent(pos.X, pos.Y, char, nil, st)
 }
 

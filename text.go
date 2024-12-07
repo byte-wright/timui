@@ -4,7 +4,7 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-func (t *Timui[B]) Text(name string, pos mathi.Vec2, fg, bg int32) {
+func (t *Timui[B]) Text(name string, pos mathi.Vec2, fg, bg RGBColor) {
 	p := t.CurrentArea().From.Add(pos)
 
 	for i, r := range []rune(name) {

@@ -13,14 +13,14 @@ func (g *Timui[B]) Button(name string) bool {
 
 	mouse := g.MouseInput(name, mathi.Box2{To: size})
 
-	bgCol := int32(0x111177)
+	bgCol := RGB(0x11, 0x11, 0x77)
 
 	if mouse.Hovered() > 0 {
-		bgCol = 0x333399
+		bgCol = RGB(0x33, 0x33, 0x99)
 	}
 
 	if mouse.LeftPressed() > 0 {
-		bgCol = 0x000066
+		bgCol = RGB(0x00, 0x00, 0x66)
 	}
 
 	pad := (size.X - len(name))

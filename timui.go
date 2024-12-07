@@ -27,7 +27,7 @@ type Backend interface {
 	Size() mathi.Vec2
 	MousePosition() mathi.Vec2
 	MousePressed(key Key) bool
-	Set(pos mathi.Vec2, char rune, fg, bg int32)
+	Set(pos mathi.Vec2, char rune, fg, bg uint32)
 	Render()
 }
 
@@ -60,7 +60,7 @@ func (t *Timui[B]) Finish() {
 
 			if t.front.get(pos) != t.back.get(pos) {
 				fc := t.front.get(pos)
-				t.backend.Set(pos, fc.char, fc.fg, fc.bg)
+				t.backend.Set(pos, fc.char, uint32(fc.fg), uint32(fc.bg))
 			}
 		}
 	}
@@ -96,6 +96,10 @@ func (t *Timui[B]) PushArea(area mathi.Box2) {
 
 func (t *Timui[B]) PopArea() {
 	t.area = t.area[:len(t.area)-1]
+}
+
+func (t *Timui[B]) GetMousePosition() mathi.Vec2 {
+	return t.backend.MousePosition()
 }
 
 func (t *Timui[B]) moveCursor(delta mathi.Vec2) {

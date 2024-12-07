@@ -14,8 +14,8 @@ type screen struct {
 
 type cell struct {
 	char rune
-	fg   int32
-	bg   int32
+	fg   RGBColor
+	bg   RGBColor
 }
 
 func newScreen(size mathi.Vec2) *screen {
@@ -78,7 +78,7 @@ func (s *screen) get(pos mathi.Vec2) cell {
 	return s.chars[i]
 }
 
-func (s *screen) set(pos mathi.Vec2, char rune, fg, bg int32) {
+func (s *screen) set(pos mathi.Vec2, char rune, fg, bg RGBColor) {
 	if pos.X < 0 || pos.Y < 0 || pos.X >= s.size.X || pos.Y >= s.size.Y {
 		return
 	}
@@ -89,7 +89,27 @@ func (s *screen) set(pos mathi.Vec2, char rune, fg, bg int32) {
 	s.chars[i].bg = bg
 }
 
-func (s *screen) clear(char rune, fg, bg int32) {
+func (s *screen) blendFG(pos mathi.Vec2, color RGBAColor) {
+	if pos.X < 0 || pos.Y < 0 || pos.X >= s.size.X || pos.Y >= s.size.Y {
+		return
+	}
+
+	i := pos.Y*s.gridSize.X + pos.X
+
+	s.chars[i].fg = s.chars[i].fg.Blend(color)
+}
+
+func (s *screen) blendBG(pos mathi.Vec2, color RGBAColor) {
+	if pos.X < 0 || pos.Y < 0 || pos.X >= s.size.X || pos.Y >= s.size.Y {
+		return
+	}
+
+	i := pos.Y*s.gridSize.X + pos.X
+
+	s.chars[i].bg = s.chars[i].bg.Blend(color)
+}
+
+func (s *screen) clear(char rune, fg, bg RGBColor) {
 	for y := 0; y < s.size.Y; y++ {
 		for x := 0; x < s.size.X; x++ {
 			s.set(mathi.Vec2{X: x, Y: y}, char, fg, bg)

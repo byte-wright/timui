@@ -5,8 +5,8 @@ import "gitlab.com/bytewright/gmath/mathi"
 func (t *Timui[B]) Border(style [6]rune) {
 	c := t.CurrentArea()
 
-	fg := int32(0xffffff)
-	bg := int32(0x000000)
+	fg := RGB(0xff, 0xff, 0xff)
+	bg := RGB(0x00, 0x00, 0x00)
 
 	for x := c.From.X + 1; x < c.To.X-1; x++ {
 		t.Set(mathi.Vec2{X: x, Y: c.From.Y}, style[0], fg, bg)
@@ -28,9 +28,17 @@ func (t *Timui[B]) Clear(char rune) {
 	// panic("not implemented")
 }
 
-func (t *Timui[B]) Set(pos mathi.Vec2, char rune, fg, bg int32) {
+func (t *Timui[B]) Set(pos mathi.Vec2, char rune, fg, bg RGBColor) {
 	clip := t.PeekClip()
 	if clip.Contains(pos) {
 		t.front.set(pos, char, fg, bg)
+	}
+}
+
+func (t *Timui[B]) Blend(pos mathi.Vec2, fg, bg RGBAColor) {
+	clip := t.PeekClip()
+	if clip.Contains(pos) {
+		t.front.blendFG(pos, fg)
+		t.front.blendBG(pos, bg)
 	}
 }
