@@ -1,1 +1,10 @@
-- screen resizing
+- screen resizing [OK]
+- transparent colors
+- modal dialog
+- row/column fixed widths
+- drag and drop
+- scrollbars
+- dropdown
+- menu
+- split area resize
+- widget style stacks

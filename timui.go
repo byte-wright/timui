@@ -69,6 +69,10 @@ func (t *Timui[B]) Finish() {
 
 	// todo screen resizing
 	t.back, t.front = t.front, t.back
+
+	t.back.resize(t.backend.Size())
+	t.front.resize(t.backend.Size())
+
 	t.front.clear(' ', 0, 0)
 
 	t.reset()
