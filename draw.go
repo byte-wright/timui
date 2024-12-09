@@ -24,6 +24,20 @@ func (t *Timui[B]) Border(style [6]rune) {
 	t.Set(mathi.Vec2{X: c.To.X - 1, Y: c.To.Y - 1}, style[5], fg, bg)
 }
 
+func (t *Timui[B]) HLine(style [3]rune) {
+	c := t.CurrentArea()
+
+	fg := RGB(0xff, 0xff, 0xff)
+	bg := RGB(0x00, 0x00, 0x00)
+
+	for x := c.From.X + 1; x < c.To.X-1; x++ {
+		t.Set(mathi.Vec2{X: x, Y: c.From.Y}, style[1], fg, bg)
+	}
+
+	t.Set(c.From, style[0], fg, bg)
+	t.Set(mathi.Vec2{X: c.To.X - 1, Y: c.From.Y}, style[2], fg, bg)
+}
+
 func (t *Timui[B]) Clear(char rune) {
 	// panic("not implemented")
 }

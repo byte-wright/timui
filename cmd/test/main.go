@@ -13,6 +13,11 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
+var (
+	count = 0
+	tui   *timui.Timui[*tcell.TCellBackend]
+)
+
 func main() {
 	// Open files for stdout and stderr redirection
 	stdoutFile, err := os.OpenFile("stdout.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
@@ -44,7 +49,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	tui := timui.New(backend)
+	tui = timui.New(backend)
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
@@ -62,8 +67,6 @@ func main() {
 		os.Exit(0)
 	}()
 
-	count := 100
-
 	for {
 		if backend.Events() {
 			break
@@ -72,37 +75,23 @@ func main() {
 		time.Sleep(time.Millisecond * 33)
 
 		panel := tui.Panel()
-		tui.Label("AAAA")
-		tui.Label("BBB")
-		tui.Label("CC")
 
-		cols := tui.Columns(timui.ByFactors([]float32{0.25, 0.25, 0.5, 1.5}).Pad(1))
+		rows := tui.Rows(timui.Split().Fixed(1, 1).Factors(1).Fixed(1, 1))
+		header()
 
-		if tui.Button("ClickMe +") {
-			count++
-		}
-		cols.Next()
+		rows.Next()
+		panel.HLine()
 
-		if tui.Button("ClickMe -") {
-			count--
-		}
-		cols.Next()
-		if tui.Button("Exit") {
-			fmt.Println("no!")
-		}
-		cols.Next()
-		if tui.Button("Quit") {
-			fmt.Println("serioulsy!")
-		}
-		if tui.Button("Settings") {
-			fmt.Println("serioulsy!")
-		}
-		if tui.Button("Start") {
-			fmt.Println("serioulsy!")
-		}
-		cols.Finish()
+		rows.Next()
+		content()
 
-		tui.Label(fmt.Sprintf("Count %v", count))
+		rows.Next()
+		panel.HLine()
+
+		rows.Next()
+		footer()
+
+		rows.Finish()
 
 		panel.Header()
 		tui.Text("[ DATA ]", mathi.Vec2{}, 0xff6666, 0x222222)
@@ -124,4 +113,46 @@ func main() {
 
 		tui.Finish()
 	}
+}
+
+func header() {
+	tui.Label("I'm the Header!")
+}
+
+func footer() {
+	tui.Label("I'm the Foooter!")
+}
+
+func content() {
+	tui.Label("AAAA")
+	tui.Label("BBB")
+	tui.Label("CC")
+
+	cols := tui.Columns(timui.Split().Factors(0.25, 0.25, 0.5, 1.5).Pad(1))
+
+	if tui.Button("ClickMe +") {
+		count++
+	}
+	cols.Next()
+
+	if tui.Button("ClickMe -") {
+		count--
+	}
+	cols.Next()
+	if tui.Button("Exit") {
+		fmt.Println("no!")
+	}
+	cols.Next()
+	if tui.Button("Quit") {
+		fmt.Println("serioulsy!")
+	}
+	if tui.Button("Settings") {
+		fmt.Println("serioulsy!")
+	}
+	if tui.Button("Start") {
+		fmt.Println("serioulsy!")
+	}
+	cols.Finish()
+
+	tui.Label(fmt.Sprintf("Count %v", count))
 }
