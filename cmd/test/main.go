@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	count = 0
-	tui   *timui.Timui[*tcell.TCellBackend]
+	count    = 0
+	tui      *timui.Timui[*tcell.TCellBackend]
+	selected int
 )
 
 func main() {
@@ -139,9 +140,9 @@ func content() {
 		count--
 	}
 	cols.Next()
-	if tui.Button("Exit") {
-		fmt.Println("no!")
-	}
+	tui.Dropdown("sel1", 10, &selected, func(i int, s bool) {
+		tui.Label(fmt.Sprintf("Item %v", i))
+	})
 	cols.Next()
 	if tui.Button("Quit") {
 		fmt.Println("serioulsy!")

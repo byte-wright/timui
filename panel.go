@@ -43,7 +43,10 @@ func (p *Panel[B]) HLine() {
 
 	p.t.PushArea(a)
 
-	p.t.HLine(hLineStyleDouble)
+	fg := RGB(0xff, 0xff, 0xff)
+	bg := RGB(0x00, 0x00, 0x00)
+
+	p.t.HLine(hLineStyleDouble, fg, bg)
 
 	p.t.PopArea()
 }

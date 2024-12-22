@@ -11,9 +11,12 @@ type Timui[B Backend] struct {
 
 	area []mathi.Box2
 
+	after []func()
+
 	idManager         idManager
 	clipManager       clipManager
 	mouseInputManager mouseInputManager[B]
+	dropdownManager   dropdownManager[B]
 }
 
 type Key int
@@ -46,14 +49,23 @@ func New[B Backend](backend B) *Timui[B] {
 		idManager:         *newIDManager(),
 		clipManager:       *newClipManager(),
 		mouseInputManager: *newMouseInputManager[B](),
+		dropdownManager:   *newDropdownManager[B](),
 	}
 
-	tui.reset()
+	tui.finish()
 
 	return tui
 }
 
+func (t *Timui[B]) runAfter(f func()) {
+	t.after = append(t.after, f)
+}
+
 func (t *Timui[B]) Finish() {
+	for _, f := range t.after {
+		f()
+	}
+
 	for y := 0; y < t.front.size.Y; y++ {
 		for x := 0; x < t.front.size.X; x++ {
 			pos := mathi.Vec2{X: x, Y: y}
@@ -75,15 +87,18 @@ func (t *Timui[B]) Finish() {
 
 	t.front.clear(' ', 0, 0)
 
-	t.reset()
+	t.finish()
 }
 
-// reset is called after each pass and also once before the first pass
-func (t *Timui[B]) reset() {
-	t.area = t.area[:]
+// finish is called after each pass and also once before the first pass
+func (t *Timui[B]) finish() {
+	t.area = t.area[:0]
 	t.area = append(t.area, mathi.Box2{To: t.backend.Size()})
 
 	t.mouseInputManager.finish(t)
+	t.dropdownManager.finish(t)
+
+	t.after = t.after[:0]
 }
 
 func (t *Timui[B]) CurrentArea() *mathi.Box2 {
