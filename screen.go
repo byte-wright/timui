@@ -13,6 +13,8 @@ type screen struct {
 }
 
 type cell struct {
+	// char defines the character that should be painted. If it is 0 it means that the
+	// character at the screen is currently undefined and must be updated.
 	char rune
 	fg   RGBColor
 	bg   RGBColor
@@ -78,41 +80,33 @@ func (s *screen) get(pos mathi.Vec2) cell {
 	return s.chars[i]
 }
 
-func (s *screen) set(pos mathi.Vec2, char rune, fg, bg RGBColor) {
-	if pos.X < 0 || pos.Y < 0 || pos.X >= s.size.X || pos.Y >= s.size.Y {
-		return
-	}
-
-	i := pos.Y*s.gridSize.X + pos.X
-	s.chars[i].char = char
-	s.chars[i].fg = fg
-	s.chars[i].bg = bg
-}
-
-func (s *screen) blendFG(pos mathi.Vec2, color RGBAColor) {
+// set paints the character, foreground and background
+// if the character is 0 the character will not be updated, old one remains.
+// colors are not changed when transparent.
+func (s *screen) set(pos mathi.Vec2, char rune, fg, bg RGBAColor) {
 	if pos.X < 0 || pos.Y < 0 || pos.X >= s.size.X || pos.Y >= s.size.Y {
 		return
 	}
 
 	i := pos.Y*s.gridSize.X + pos.X
 
-	s.chars[i].fg = s.chars[i].fg.Blend(color)
-}
-
-func (s *screen) blendBG(pos mathi.Vec2, color RGBAColor) {
-	if pos.X < 0 || pos.Y < 0 || pos.X >= s.size.X || pos.Y >= s.size.Y {
-		return
+	if char != 0 {
+		s.chars[i].char = char
 	}
 
-	i := pos.Y*s.gridSize.X + pos.X
-
-	s.chars[i].bg = s.chars[i].bg.Blend(color)
+	s.chars[i].fg = s.chars[i].fg.Blend(fg)
+	s.chars[i].bg = s.chars[i].bg.Blend(bg)
 }
 
+// clear sets the whole screen to given values.
 func (s *screen) clear(char rune, fg, bg RGBColor) {
 	for y := 0; y < s.size.Y; y++ {
 		for x := 0; x < s.size.X; x++ {
-			s.set(mathi.Vec2{X: x, Y: y}, char, fg, bg)
+			i := y*s.gridSize.X + x
+
+			s.chars[i].char = char
+			s.chars[i].fg = fg
+			s.chars[i].bg = bg
 		}
 	}
 }

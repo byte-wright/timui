@@ -8,6 +8,7 @@ import (
 
 var (
 	dropdownInputStyle     = [3]rune{'[', ' ', ']'}
+	dropdownSelectionStyle = [3]rune{' ', ' ', ' '}
 	dropdownBordeStyle     = [6]rune{'-', '|', '/', '\\', '\\', '/'}
 	dropdownBordeStyleLine = [6]rune{'─', '│', '┌', '┐', '└', '┘'}
 )
@@ -73,7 +74,7 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 				if mi.Hovered() > 0 {
 					fg := RGB(0xff, 0xff, 0xff)
 					bg := RGB(0x00, 0x00, 0x66)
-					g.HLine(dropdownInputStyle, fg, bg)
+					g.HLine(dropdownSelectionStyle, fg, bg)
 				}
 
 				if mi.LeftReleased() {
@@ -83,8 +84,8 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 
 				g.PopArea()
 
-				ma.From.X += 8
-				ma.To.X -= 8
+				ma.From.X += 1
+				ma.To.X -= 1
 
 				g.PushArea(ma)
 				dd.paint(i, dd.selected == i)
@@ -123,14 +124,14 @@ func (d *dropdown[B]) paintSelection() {
 	}
 
 	if d.open {
-		d.g.Text("[v]", mathi.Vec2{X: remWidth - 3}, RGB(255, 255, 255), RGB(0x33, 0x33, 0x33))
+		d.g.Text("][ʌ]", mathi.Vec2{X: remWidth - 4}, RGBA(255, 255, 255, 0xff), RGBA(0x33, 0x33, 0x33, 0x00))
 	} else {
-		d.g.Text("[^]", mathi.Vec2{X: remWidth - 3}, RGB(255, 255, 255), RGB(0x33, 0x33, 0x33))
+		d.g.Text("][v]", mathi.Vec2{X: remWidth - 4}, RGBA(255, 255, 255, 0xff), RGBA(0x33, 0x33, 0x33, 0x00))
 	}
 
 	a := *d.g.CurrentArea()
 	a.To.Y = a.From.Y
-	a.From.X += 1
+	a.From.X += 2
 	a.To.X -= 1
 	d.g.PushArea(a)
 	d.paint(d.selected, false)

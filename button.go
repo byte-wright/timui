@@ -13,14 +13,14 @@ func (g *Timui[B]) Button(name string) bool {
 
 	mouse := g.MouseInput(name, mathi.Box2{To: size})
 
-	bgCol := RGB(0x11, 0x11, 0x77)
+	bgCol := RGBA(0x11, 0x11, 0x77, 0xff)
 
 	if mouse.Hovered() > 0 {
-		bgCol = RGB(0x33, 0x33, 0x99)
+		bgCol = RGBA(0x33, 0x33, 0x99, 0xff)
 	}
 
 	if mouse.LeftPressed() > 0 {
-		bgCol = RGB(0x00, 0x00, 0x66)
+		bgCol = RGBA(0x00, 0x00, 0x66, 0xff)
 	}
 
 	pad := (size.X - len(name))
@@ -38,7 +38,7 @@ func (g *Timui[B]) Button(name string) bool {
 	}
 
 	g.Text("["+strings.Repeat(" ", padl)+name+strings.Repeat(" ", padr)+"]",
-		mathi.Vec2{}, 0xbbbbbb, bgCol)
+		mathi.Vec2{}, 0xffbbbbbb, bgCol)
 
 	g.moveCursor(mathi.Vec2{Y: 1})
 

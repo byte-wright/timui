@@ -99,18 +99,18 @@ func main() {
 
 		panel.Finish()
 
-		pos := tui.GetMousePosition()
-		for y := -4; y < 5; y++ {
-			for x := -8; x < 9; x++ {
-				delta := mathi.Vec2{X: x, Y: y}
-				dist := mathi.Vec2{X: x, Y: y * 2}.Len()
+		// pos := tui.GetMousePosition()
+		// for y := -4; y < 5; y++ {
+		// 	for x := -8; x < 9; x++ {
+		// 		delta := mathi.Vec2{X: x, Y: y}
+		// 		dist := mathi.Vec2{X: x, Y: y * 2}.Len()
 
-				if dist < 8 {
-					f := (10 - dist) * 6
-					tui.Blend(pos.Add(delta), timui.RGBA(0xff, 0xaa, 0x00, f), timui.RGBA(0xff, 0xaa, 0x00, f))
-				}
-			}
-		}
+		// 		if dist < 8 {
+		// 			f := (10 - dist) * 6
+		// 			tui.Blend(pos.Add(delta), timui.RGBA(0xff, 0xaa, 0x00, f), timui.RGBA(0xff, 0xaa, 0x00, f))
+		// 		}
+		// 	}
+		// }
 
 		tui.Finish()
 	}

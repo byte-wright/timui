@@ -42,14 +42,6 @@ func (t *Timui[B]) Clear(char rune) {
 func (t *Timui[B]) Set(pos mathi.Vec2, char rune, fg, bg RGBColor) {
 	clip := t.PeekClip()
 	if clip.Contains(pos) {
-		t.front.set(pos, char, fg, bg)
-	}
-}
-
-func (t *Timui[B]) Blend(pos mathi.Vec2, fg, bg RGBAColor) {
-	clip := t.PeekClip()
-	if clip.Contains(pos) {
-		t.front.blendFG(pos, fg)
-		t.front.blendBG(pos, bg)
+		t.front.set(pos, char, fg.RGBA(0xff), bg.RGBA(0xff))
 	}
 }

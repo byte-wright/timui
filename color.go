@@ -52,6 +52,10 @@ func (rgb RGBColor) Blend(rgba RGBAColor) RGBColor {
 	return c.Add(o)
 }
 
+func (rgb RGBColor) RGBA(a int) RGBAColor {
+	return RGBAColor(int32(a&0xff<<24) | int32(rgb))
+}
+
 func (rgb RGBColor) String() string {
 	hs := fmt.Sprintf("%08X", uint32(rgb))
 	return "#" + hs[2:]
