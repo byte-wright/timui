@@ -3,6 +3,7 @@ package timui
 import (
 	"strconv"
 
+	"github.com/byte-wright/timui/internal"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
@@ -22,12 +23,12 @@ type dropdown[B Backend] struct {
 }
 
 type dropdownManager[B Backend] struct {
-	lastDropdowns map[ID]*dropdown[B]
-	nextDropdowns map[ID]*dropdown[B]
+	lastDropdowns map[internal.ID]*dropdown[B]
+	nextDropdowns map[internal.ID]*dropdown[B]
 }
 
 func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i int, s bool)) {
-	cid := g.PushID(id)
+	cid := g.id.Push(id)
 	dd, has := g.dropdownManager.lastDropdowns[cid]
 	if !has {
 		dd = &dropdown[B]{g: g}
@@ -41,13 +42,13 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 
 	dd.paintSelection()
 
-	g.PopID()
+	g.id.Pop()
 
 	area := *g.CurrentArea()
 
 	if dd.open {
 		g.runAfter(func() {
-			g.PushID(cid.value)
+			g.id.PushID(cid)
 
 			modal := g.MouseInput("modal", *g.CurrentArea())
 			if modal.LeftReleased() {
@@ -62,6 +63,8 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 			g.Border(dropdownBordeStyleLine)
 
 			pad := g.Pad(1, 1, 1, 1)
+
+			g.id.Push("selection")
 
 			for i := 0; i < dd.elements; i++ {
 				ma := *g.CurrentArea()
@@ -94,9 +97,11 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 				g.moveCursor(mathi.Vec2{Y: 1})
 			}
 
+			g.id.Pop()
+
 			pad.Finish()
 			g.PopArea()
-			g.PopID()
+			g.id.Pop()
 		})
 	}
 }
@@ -141,12 +146,12 @@ func (d *dropdown[B]) paintSelection() {
 
 func newDropdownManager[B Backend]() *dropdownManager[B] {
 	return &dropdownManager[B]{
-		lastDropdowns: map[ID]*dropdown[B]{},
-		nextDropdowns: map[ID]*dropdown[B]{},
+		lastDropdowns: map[internal.ID]*dropdown[B]{},
+		nextDropdowns: map[internal.ID]*dropdown[B]{},
 	}
 }
 
 func (m *dropdownManager[B]) finish(_ *Timui[B]) {
 	m.lastDropdowns, m.nextDropdowns = m.nextDropdowns, m.lastDropdowns
-	m.nextDropdowns = map[ID]*dropdown[B]{}
+	m.nextDropdowns = map[internal.ID]*dropdown[B]{}
 }

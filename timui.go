@@ -1,6 +1,7 @@
 package timui
 
 import (
+	"github.com/byte-wright/timui/internal"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
@@ -13,7 +14,7 @@ type Timui[B Backend] struct {
 
 	after []func()
 
-	idManager         idManager
+	id                internal.IDManager
 	clipManager       clipManager
 	mouseInputManager mouseInputManager[B]
 	dropdownManager   dropdownManager[B]
@@ -46,7 +47,7 @@ func New[B Backend](backend B) *Timui[B] {
 		back:    newScreen(size),
 
 		area:              []mathi.Box2{},
-		idManager:         *newIDManager(),
+		id:                *internal.NewIDManager(),
 		clipManager:       *newClipManager(),
 		mouseInputManager: *newMouseInputManager[B](),
 		dropdownManager:   *newDropdownManager[B](),

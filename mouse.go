@@ -1,6 +1,7 @@
 package timui
 
 import (
+	"github.com/byte-wright/timui/internal"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
@@ -15,15 +16,15 @@ type MouseInput struct {
 }
 
 type mouseInputManager[B Backend] struct {
-	lastInputs map[ID]*MouseInput
-	nextInputs map[ID]*MouseInput
+	lastInputs map[internal.ID]*MouseInput
+	nextInputs map[internal.ID]*MouseInput
 
 	underCursor     *MouseInput
 	lastUnderCursor *MouseInput
 }
 
 func (g *Timui[B]) MouseInput(id string, area mathi.Box2) *MouseInput {
-	cid := g.PushID(id)
+	cid := g.id.Push(id)
 	mouseInput, has := g.mouseInputManager.lastInputs[cid]
 	if !has {
 		mouseInput = &MouseInput{}
@@ -57,7 +58,7 @@ func (g *Timui[B]) MouseInput(id string, area mathi.Box2) *MouseInput {
 
 	g.mouseInputManager.nextInputs[cid] = mouseInput
 
-	g.PopID()
+	g.id.Pop()
 
 	return mouseInput
 }
@@ -76,8 +77,8 @@ func (m *MouseInput) LeftReleased() bool {
 
 func newMouseInputManager[B Backend]() *mouseInputManager[B] {
 	return &mouseInputManager[B]{
-		lastInputs: map[ID]*MouseInput{},
-		nextInputs: map[ID]*MouseInput{},
+		lastInputs: map[internal.ID]*MouseInput{},
+		nextInputs: map[internal.ID]*MouseInput{},
 	}
 }
 
@@ -95,5 +96,5 @@ func (m *mouseInputManager[B]) finish(g *Timui[B]) {
 	}
 
 	m.lastInputs, m.nextInputs = m.nextInputs, m.lastInputs
-	m.nextInputs = map[ID]*MouseInput{}
+	m.nextInputs = map[internal.ID]*MouseInput{}
 }
