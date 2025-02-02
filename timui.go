@@ -7,8 +7,8 @@ import (
 
 type Timui[B Backend] struct {
 	backend B
-	front   *screen
-	back    *screen
+	front   *internal.Screen
+	back    *internal.Screen
 
 	area []mathi.Box2
 
@@ -38,13 +38,13 @@ type Backend interface {
 func New[B Backend](backend B) *Timui[B] {
 	size := backend.Size()
 
-	front := newScreen(size)
-	front.clear(' ', 0, 0)
+	front := internal.NewScreen(size)
+	front.Clear(' ', 0, 0)
 
 	tui := &Timui[B]{
 		backend: backend,
 		front:   front,
-		back:    newScreen(size),
+		back:    internal.NewScreen(size),
 
 		area:              []mathi.Box2{},
 		id:                *internal.NewIDManager(),
@@ -67,13 +67,13 @@ func (t *Timui[B]) Finish() {
 		f()
 	}
 
-	for y := 0; y < t.front.size.Y; y++ {
-		for x := 0; x < t.front.size.X; x++ {
+	for y := 0; y < t.front.Size.Y; y++ {
+		for x := 0; x < t.front.Size.X; x++ {
 			pos := mathi.Vec2{X: x, Y: y}
 
-			if t.front.get(pos) != t.back.get(pos) {
-				fc := t.front.get(pos)
-				t.backend.Set(pos, fc.char, uint32(fc.fg), uint32(fc.bg))
+			if t.front.Get(pos) != t.back.Get(pos) {
+				fc := t.front.Get(pos)
+				t.backend.Set(pos, fc.Char, uint32(fc.FG), uint32(fc.BG))
 			}
 		}
 	}
@@ -83,10 +83,10 @@ func (t *Timui[B]) Finish() {
 	// todo screen resizing
 	t.back, t.front = t.front, t.back
 
-	t.back.resize(t.backend.Size())
-	t.front.resize(t.backend.Size())
+	t.back.Resize(t.backend.Size())
+	t.front.Resize(t.backend.Size())
 
-	t.front.clear(' ', 0, 0)
+	t.front.Clear(' ', 0, 0)
 
 	t.finish()
 }

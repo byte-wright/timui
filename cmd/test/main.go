@@ -109,7 +109,7 @@ func main() {
 
 		// 		if dist < 8 {
 		// 			f := (10 - dist) * 6
-		// 			tui.Blend(pos.Add(delta), timui.RGBA(0xff, 0xaa, 0x00, f), timui.RGBA(0xff, 0xaa, 0x00, f))
+		// 			tui.SetAlpha(pos.Add(delta), 0, timui.RGBA(0xff, 0xaa, 0x00, f), timui.RGBA(0xff, 0xaa, 0x00, f))
 		// 		}
 		// 	}
 		// }

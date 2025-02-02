@@ -39,9 +39,16 @@ func (t *Timui[B]) Clear(char rune) {
 	// panic("not implemented")
 }
 
+func (t *Timui[B]) SetAlpha(pos mathi.Vec2, char rune, fg, bg RGBAColor) {
+	clip := t.PeekClip()
+	if clip.Contains(pos) {
+		t.front.Set(pos, char, uint32(fg), uint32(bg))
+	}
+}
+
 func (t *Timui[B]) Set(pos mathi.Vec2, char rune, fg, bg RGBColor) {
 	clip := t.PeekClip()
 	if clip.Contains(pos) {
-		t.front.set(pos, char, fg.RGBA(0xff), bg.RGBA(0xff))
+		t.front.Set(pos, char, uint32(fg.RGBA(0xff)), uint32(bg.RGBA(0xff)))
 	}
 }
