@@ -17,6 +17,8 @@ var (
 	count    = 0
 	tui      *timui.Timui[*tcell.TCellBackend]
 	selected int
+	checkedA bool
+	checkedB bool
 )
 
 func main() {
@@ -129,7 +131,7 @@ func content() {
 	tui.Label("BBB")
 	tui.Label("CC")
 
-	cols := tui.Columns(timui.Split().Factors(0.25, 0.25, 0.5, 1.5).Pad(1))
+	cols := tui.Columns(timui.Split().Factors(0.25, 0.25, 0.5, 0.3, 1.5).Pad(1))
 
 	if tui.Button("ClickMe +") {
 		count++
@@ -143,6 +145,12 @@ func content() {
 	tui.Dropdown("sel1", 10, &selected, func(i int, s bool) {
 		tui.Label(fmt.Sprintf("Item %v", i))
 	})
+	cols.Next()
+
+	tui.Checkbox("Alpha", &checkedA)
+	tui.Checkbox("Beta.1", &checkedB)
+	tui.Checkbox("Beta.2", &checkedB)
+
 	cols.Next()
 	if tui.Button("Quit") {
 		fmt.Println("serioulsy!")
