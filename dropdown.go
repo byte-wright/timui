@@ -40,7 +40,7 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 
 	g.dropdownManager.nextDropdowns[cid] = dd
 
-	dd.paintSelection()
+	dd.paintSelection(&g.Theme)
 
 	g.id.Pop()
 
@@ -106,39 +106,40 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 	}
 }
 
-func (d *dropdown[B]) paintSelection() {
+func (d *dropdown[B]) paintSelection(theme *Theme) {
 	remWidth := d.g.CurrentArea().Size().X
 
 	size := mathi.Vec2{X: remWidth, Y: 1}
 
 	mouse := d.g.MouseInput("area", mathi.Box2{To: size})
-
-	if mouse.Hovered() > 0 {
-		fg := RGB(0xff, 0xff, 0xff)
-		bg := RGB(0x00, 0x00, 0x88)
-
-		d.g.HLine(dropdownInputStyle, fg, bg)
-	} else {
-		fg := RGB(0xff, 0xff, 0xff)
-		bg := RGB(0x00, 0x00, 0x66)
-		d.g.HLine(dropdownInputStyle, fg, bg)
-	}
-
 	if mouse.LeftReleased() {
 		d.open = !d.open
 	}
 
+	bgCol := theme.Widget.BG
+
+	if mouse.Hovered() > 0 || d.open {
+		bgCol = theme.Widget.HoverBG
+	}
+
+	if mouse.LeftPressed() > 0 {
+		bgCol = theme.Widget.InteractBG
+	}
+
+	d.g.HLine(dropdownInputStyle, theme.Widget.Line, bgCol)
+
 	if d.open {
-		d.g.Text("][ʌ]", mathi.Vec2{X: remWidth - 4}, RGBA(255, 255, 255, 0xff), RGBA(0x33, 0x33, 0x33, 0x00))
+		d.g.Text("][ʌ]", mathi.Vec2{X: remWidth - 4}, theme.Widget.Line.RGBA(0xff), bgCol.RGBA(0xff))
 	} else {
-		d.g.Text("][v]", mathi.Vec2{X: remWidth - 4}, RGBA(255, 255, 255, 0xff), RGBA(0x33, 0x33, 0x33, 0x00))
+		d.g.Text("][v]", mathi.Vec2{X: remWidth - 4}, theme.Widget.Line.RGBA(0xff), bgCol.RGBA(0xff))
 	}
 
 	a := *d.g.CurrentArea()
 	a.To.Y = a.From.Y
 	a.From.X += 2
-	a.To.X -= 1
+	a.To.X -= 6
 	d.g.PushArea(a)
+	d.g.SetArea(0, theme.Widget.Text, bgCol)
 	d.paint(d.selected, false)
 	d.g.PopArea()
 	d.g.moveCursor(mathi.Vec2{Y: 1})

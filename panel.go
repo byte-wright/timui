@@ -26,8 +26,6 @@ func (t *Timui[B]) Panel() *Panel[B] {
 
 	t.PushArea(area)
 
-	t.Clear(' ')
-
 	return &Panel[B]{
 		t:    t,
 		area: originalArea,

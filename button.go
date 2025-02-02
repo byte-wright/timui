@@ -7,20 +7,21 @@ import (
 )
 
 func (g *Timui[B]) Button(name string) bool {
-	size := g.CurrentArea().Size()
+	area := g.CurrentArea()
+	size := area.Size()
 
 	size.Y = 1
 
 	mouse := g.MouseInput(name, mathi.Box2{To: size})
 
-	bgCol := RGBA(0x11, 0x11, 0x77, 0xff)
+	bgCol := g.Theme.Widget.BG
 
 	if mouse.Hovered() > 0 {
-		bgCol = RGBA(0x33, 0x33, 0x99, 0xff)
+		bgCol = g.Theme.Widget.HoverBG
 	}
 
 	if mouse.LeftPressed() > 0 {
-		bgCol = RGBA(0x00, 0x00, 0x66, 0xff)
+		bgCol = g.Theme.Widget.InteractBG
 	}
 
 	pad := (size.X - len(name))
@@ -37,8 +38,12 @@ func (g *Timui[B]) Button(name string) bool {
 		padl = 0
 	}
 
-	g.Text("["+strings.Repeat(" ", padl)+name+strings.Repeat(" ", padr)+"]",
-		mathi.Vec2{}, 0xffbbbbbb, bgCol)
+	g.Set(area.From, '[', g.Theme.Widget.Line, bgCol)
+
+	g.Set(area.From.Add(mathi.Vec2{X: size.X - 1}), ']', g.Theme.Widget.Line, bgCol)
+
+	g.Text(strings.Repeat(" ", padl)+name+strings.Repeat(" ", padr),
+		mathi.Vec2{X: 1}, g.Theme.Widget.Text.RGBA(0xff), bgCol.RGBA(0xff))
 
 	g.moveCursor(mathi.Vec2{Y: 1})
 

@@ -143,7 +143,7 @@ func content() {
 	}
 	cols.Next()
 	tui.Dropdown("sel1", 10, &selected, func(i int, s bool) {
-		tui.Label(fmt.Sprintf("Item %v", i))
+		tui.Label(fmt.Sprintf("Item %v is my friend", i))
 	})
 	cols.Next()
 

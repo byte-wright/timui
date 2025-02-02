@@ -13,6 +13,15 @@ func (t *Timui[B]) Text(name string, pos mathi.Vec2, fg, bg RGBAColor) {
 }
 
 func (t *Timui[B]) Label(name string) {
-	t.Text(name, mathi.Vec2{}, 0xffdddddd, 0x00000000)
+	w := t.CurrentArea().Size().X
+
+	if len(name) > w+1 {
+		ne := w - 2
+		if ne > 0 {
+			name = name[:ne] + "..."
+		}
+	}
+
+	t.Text(name, mathi.Vec2{}, Transparent, Transparent)
 	t.moveCursor(mathi.Vec2{Y: 1})
 }

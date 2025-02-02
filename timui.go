@@ -18,6 +18,8 @@ type Timui[B Backend] struct {
 	clipManager       clipManager
 	mouseInputManager mouseInputManager[B]
 	dropdownManager   dropdownManager[B]
+
+	Theme Theme
 }
 
 type Key int
@@ -51,6 +53,8 @@ func New[B Backend](backend B) *Timui[B] {
 		clipManager:       *newClipManager(),
 		mouseInputManager: *newMouseInputManager[B](),
 		dropdownManager:   *newDropdownManager[B](),
+
+		Theme: DefaultTheme,
 	}
 
 	tui.finish()
