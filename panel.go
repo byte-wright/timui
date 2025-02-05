@@ -4,18 +4,13 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-var (
-	borderStyleDouble = [6]rune{'═', '║', '╔', '╗', '╚', '╝'}
-	hLineStyleDouble  = [3]rune{'╠', '═', '╣'}
-)
-
 type Panel[B Backend] struct {
 	t    *Timui[B]
 	area mathi.Box2
 }
 
 func (t *Timui[B]) Panel() *Panel[B] {
-	t.Border(borderStyleDouble)
+	t.Border(t.Theme.Border.Rect)
 
 	area := *t.CurrentArea()
 	originalArea := area
@@ -44,7 +39,7 @@ func (p *Panel[B]) HLine() {
 	fg := RGB(0xff, 0xff, 0xff)
 	bg := RGB(0x00, 0x00, 0x00)
 
-	p.t.HLine(hLineStyleDouble, fg, bg)
+	p.t.HLine(p.t.Theme.Border.Horizontal, fg, bg)
 
 	p.t.PopArea()
 }

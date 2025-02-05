@@ -19,7 +19,7 @@ func Split() *SplitOptions {
 	return &SplitOptions{}
 }
 
-func (s *SplitOptions) Factors(factors ...float32) *SplitOptions {
+func (s *SplitOptions) Factor(factors ...float32) *SplitOptions {
 	for _, f := range factors {
 		s.splits = append(s.splits, split{factor: f})
 	}
@@ -31,6 +31,20 @@ func (s *SplitOptions) Fixed(fixed ...int) *SplitOptions {
 	for _, f := range fixed {
 		s.splits = append(s.splits, split{fixed: f})
 	}
+
+	return s
+}
+
+func (s *SplitOptions) insertFixedBetween(v int) *SplitOptions {
+	ns := []split{}
+
+	ns = append(ns, split{fixed: v})
+	for _, f := range s.splits {
+		ns = append(ns, f)
+		ns = append(ns, split{fixed: v})
+	}
+
+	s.splits = ns
 
 	return s
 }
@@ -61,7 +75,11 @@ func (so *SplitOptions) calculatePositions(width int) []splitRange {
 	for i, f := range so.splits {
 		positions[i].from = pos
 
-		w := int(float32(remaining) * f.factor / totalFactor)
+		w := 0
+		if remaining > 0 {
+			w = int(float32(remaining) * f.factor / totalFactor)
+		}
+
 		pos += w
 		pos += f.fixed
 		positions[i].to = pos

@@ -4,6 +4,7 @@ type Theme struct {
 	BG     RGBColor
 	Text   RGBColor
 	Widget WidgetTheme
+	Border BorderStyle
 }
 
 type WidgetTheme struct {
@@ -13,6 +14,12 @@ type WidgetTheme struct {
 	HoverBG    RGBColor
 	InteractBG RGBColor
 	FocusLine  RGBColor
+}
+
+type BorderStyle struct {
+	Rect       [6]rune
+	Horizontal [3]rune
+	Vertical   [3]rune
 }
 
 var DefaultTheme = Theme{
@@ -26,4 +33,32 @@ var DefaultTheme = Theme{
 		InteractBG: MustRGBS("#008"),
 		FocusLine:  MustRGBS("#ffa"),
 	},
+	Border: BorderDouble,
+}
+
+var BorderDouble = BorderStyle{
+	Rect:       [6]rune{'═', '║', '╔', '╗', '╚', '╝'},
+	Vertical:   [3]rune{'╦', '║', '╩'},
+	Horizontal: [3]rune{'╠', '═', '╣'},
+}
+
+var BorderSingle = BorderStyle{
+	Rect:       [6]rune{'─', '│', '┌', '┐', '└', '┘'},
+	Vertical:   [3]rune{'┬', '│', '┴'},
+	Horizontal: [3]rune{'├', '─', '┤'},
+}
+
+var BorderRoundSingle = BorderStyle{
+	Rect:       [6]rune{'─', '│', '╭', '╮', '╰', '╯'},
+	Vertical:   [3]rune{'┬', '│', '┴'},
+	Horizontal: [3]rune{'├', '─', '┤'},
+}
+
+func (t *Theme) UseBorder(b BorderStyle) func() {
+	before := t.Border
+	t.Border = b
+
+	return func() {
+		t.Border = before
+	}
 }

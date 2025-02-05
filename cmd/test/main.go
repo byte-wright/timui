@@ -79,7 +79,7 @@ func main() {
 
 		panel := tui.Panel()
 
-		rows := tui.Rows(timui.Split().Fixed(1, 1).Factors(1).Fixed(1, 1))
+		rows := tui.Rows(timui.Split().Fixed(1, 1).Fixed(7, 1).Factor(0.5).Fixed(1, 1))
 		header()
 
 		rows.Next()
@@ -87,6 +87,11 @@ func main() {
 
 		rows.Next()
 		content()
+
+		rows.Next()
+		panel.HLine()
+
+		rows.Next()
 
 		rows.Next()
 		panel.HLine()
@@ -131,7 +136,7 @@ func content() {
 	tui.Label("BBB")
 	tui.Label("CC")
 
-	cols := tui.Columns(timui.Split().Factors(0.25, 0.25, 0.5, 0.3, 1.5).Pad(1))
+	cols := tui.Columns(timui.Split().Factor(0.25, 0.25, 0.5, 0.3, 1.5).Pad(1))
 
 	if tui.Button("ClickMe +") {
 		count++
