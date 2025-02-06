@@ -10,7 +10,7 @@ type Panel[B Backend] struct {
 }
 
 func (t *Timui[B]) Panel() *Panel[B] {
-	t.Border(t.Theme.Border.Rect)
+	t.Border(t.Theme.BorderStyle.Rect, t.Theme.BorderLine, t.Theme.BorderBG)
 
 	area := *t.CurrentArea()
 	originalArea := area
@@ -36,10 +36,7 @@ func (p *Panel[B]) HLine() {
 
 	p.t.PushArea(a)
 
-	fg := RGB(0xff, 0xff, 0xff)
-	bg := RGB(0x00, 0x00, 0x00)
-
-	p.t.HLine(p.t.Theme.Border.Horizontal, fg, bg)
+	p.t.HLine(p.t.Theme.BorderStyle.Horizontal, p.t.Theme.BorderLine, p.t.Theme.BorderBG)
 
 	p.t.PopArea()
 }

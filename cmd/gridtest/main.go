@@ -180,19 +180,35 @@ func leftSingleGrid() {
 func rightSingleGrid() {
 	revert := tui.Theme.UseBorder(timui.BorderSingle)
 	pad := tui.Pad(0, 1, 0, 1)
-	subGrid := tui.Grid()
+	grid := tui.Grid()
 
 	{
 		revert2 := tui.Theme.UseBorder(timui.BorderDouble)
-		subRows := subGrid.Columns(timui.Split().Factor(1, 1))
+		rows := grid.Columns(timui.Split().Factor(1, 1))
 
-		subRows.Next()
+		{
+			revert3 := tui.Theme.UseBorder(timui.BorderSingle)
+			subRows := rows.Columns(timui.Split().Fixed(1).Factor(1))
+			tui.Label("A")
+			tui.Label("B")
+			tui.Label("C")
 
-		subRows.Finish()
+			subRows.Next()
+			tui.Label("Content...")
+			tui.Label("Content...")
+			tui.Label("Content...")
+
+			subRows.Finish()
+			revert3()
+		}
+
+		rows.Next()
+
+		rows.Finish()
 		revert2()
 	}
 
-	subGrid.Finish()
+	grid.Finish()
 	pad.Finish()
 	revert()
 }

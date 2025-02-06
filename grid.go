@@ -10,7 +10,7 @@ type Grid[B Backend] struct {
 }
 
 func (t *Timui[B]) Grid() *Grid[B] {
-	t.Border(t.Theme.Border.Rect)
+	t.Border(t.Theme.BorderStyle.Rect, t.Theme.BorderLine, t.Theme.BorderBG)
 
 	area := *t.CurrentArea()
 	originalArea := area
@@ -98,7 +98,7 @@ func (g *GridRows[B]) Next() {
 
 	g.t.PushArea(g.currentArea())
 
-	g.t.HLine(g.t.Theme.Border.Horizontal, g.t.Theme.Text, g.t.Theme.BG)
+	g.t.HLine(g.t.Theme.BorderStyle.Horizontal, g.t.Theme.BorderLine, g.t.Theme.BorderBG)
 	g.t.PopArea()
 
 	g.row += 1
@@ -202,7 +202,7 @@ func (g *GridColumns[B]) Next() {
 
 	g.t.PushArea(area)
 
-	g.t.VLine(g.t.Theme.Border.Vertical, g.t.Theme.Text, g.t.Theme.BG)
+	g.t.VLine(g.t.Theme.BorderStyle.Vertical, g.t.Theme.BorderLine, g.t.Theme.BorderBG)
 	g.t.PopArea()
 
 	g.column += 1
@@ -240,6 +240,33 @@ func (g *GridColumns[B]) Rows(pos *SplitOptions) *GridRows[B] {
 	g.t.PushArea(area)
 
 	return gridRows
+}
+
+func (g *GridColumns[B]) Columns(pos *SplitOptions) *GridColumns[B] {
+	if pos.padding != 0 {
+		panic("grid rows padding must be zero")
+	}
+
+	pos.insertFixedBetween(1)
+
+	positions := pos.calculatePositions(g.area.Size().X)
+
+	gridColumns := &GridColumns[B]{
+		t:         g.t,
+		positions: positions,
+		area:      g.currentCompleteArea(),
+		column:    1,
+	}
+
+	area := gridColumns.currentArea()
+
+	pad := mathi.Vec2{Y: 1}
+	area.From = area.From.Add(pad)
+	area.To = area.To.Sub(pad)
+
+	g.t.PushArea(area)
+
+	return gridColumns
 }
 
 func (g *GridColumns[B]) currentArea() mathi.Box2 {

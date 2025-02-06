@@ -96,7 +96,7 @@ func (s *Screen) Set(pos mathi.Vec2, char rune, fg, bg uint32) {
 }
 
 // clear sets the whole screen to given values.
-func (s *Screen) Clear(char rune, fg, bg uint32) {
+func (s *Screen) SetScreen(char rune, fg, bg uint32) {
 	for y := 0; y < s.Size.Y; y++ {
 		for x := 0; x < s.Size.X; x++ {
 			i := y*s.gridSize.X + x

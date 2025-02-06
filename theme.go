@@ -1,10 +1,12 @@
 package timui
 
 type Theme struct {
-	BG     RGBColor
-	Text   RGBColor
-	Widget WidgetTheme
-	Border BorderStyle
+	BG          RGBColor
+	Text        RGBColor
+	BorderLine  RGBColor
+	BorderBG    RGBColor
+	Widget      WidgetTheme
+	BorderStyle BorderStyle
 }
 
 type WidgetTheme struct {
@@ -23,8 +25,10 @@ type BorderStyle struct {
 }
 
 var DefaultTheme = Theme{
-	BG:   MustRGBS("#000"),
-	Text: MustRGBS("#faa"),
+	BG:         MustRGBS("#000"),
+	Text:       MustRGBS("#f33"),
+	BorderLine: MustRGBS("#3ff"),
+	BorderBG:   MustRGBS("#000"),
 	Widget: WidgetTheme{
 		BG:         MustRGBS("#004"),
 		Text:       MustRGBS("#bbb"),
@@ -33,7 +37,7 @@ var DefaultTheme = Theme{
 		InteractBG: MustRGBS("#008"),
 		FocusLine:  MustRGBS("#ffa"),
 	},
-	Border: BorderDouble,
+	BorderStyle: BorderDouble,
 }
 
 var BorderDouble = BorderStyle{
@@ -54,11 +58,23 @@ var BorderRoundSingle = BorderStyle{
 	Horizontal: [3]rune{'├', '─', '┤'},
 }
 
+var BorderNone = BorderStyle{
+	Rect:       [6]rune{' ', ' ', ' ', ' ', ' ', ' '},
+	Vertical:   [3]rune{' ', ' ', ' '},
+	Horizontal: [3]rune{' ', ' ', ' '},
+}
+
+var BorderBasic = BorderStyle{
+	Rect:       [6]rune{'-', '|', '/', '\\', '\\', '/'},
+	Vertical:   [3]rune{'+', '|', '+'},
+	Horizontal: [3]rune{'+', '-', '+'},
+}
+
 func (t *Theme) UseBorder(b BorderStyle) func() {
-	before := t.Border
-	t.Border = b
+	before := t.BorderStyle
+	t.BorderStyle = b
 
 	return func() {
-		t.Border = before
+		t.BorderStyle = before
 	}
 }

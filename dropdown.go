@@ -60,7 +60,7 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 			area.To.Y = area.From.Y + height + 2
 			g.PushArea(area)
 
-			g.Border(dropdownBordeStyleLine)
+			g.Border(dropdownBordeStyleLine, g.Theme.BorderLine, g.Theme.BorderBG)
 
 			pad := g.Pad(1, 1, 1, 1)
 

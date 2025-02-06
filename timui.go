@@ -41,7 +41,7 @@ func New[B Backend](backend B) *Timui[B] {
 	size := backend.Size()
 
 	front := internal.NewScreen(size)
-	front.Clear(' ', 0, 0)
+	front.SetScreen(' ', 0, 0)
 
 	tui := &Timui[B]{
 		backend: backend,
@@ -90,7 +90,7 @@ func (t *Timui[B]) Finish() {
 	t.back.Resize(t.backend.Size())
 	t.front.Resize(t.backend.Size())
 
-	t.front.Clear(' ', 0, 0)
+	t.front.SetScreen(' ', uint32(t.Theme.Text), uint32(t.Theme.BG))
 
 	t.finish()
 }

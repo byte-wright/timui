@@ -2,11 +2,8 @@ package timui
 
 import "gitlab.com/bytewright/gmath/mathi"
 
-func (t *Timui[B]) Border(style [6]rune) {
+func (t *Timui[B]) Border(style [6]rune, fg, bg RGBColor) {
 	c := t.CurrentArea()
-
-	fg := RGB(0xff, 0xff, 0xff)
-	bg := RGB(0x00, 0x00, 0x00)
 
 	for x := c.From.X + 1; x < c.To.X-1; x++ {
 		t.SetBorder(mathi.Vec2{X: x, Y: c.From.Y}, style[0], fg, bg)
@@ -119,6 +116,11 @@ func (t *Timui[B]) SetBorder(pos mathi.Vec2, char rune, fg, bg RGBColor) {
 			switch current {
 			case '─':
 				char = '╨'
+			}
+		case '-':
+			switch current {
+			case '+':
+				char = '+'
 			}
 
 		}
