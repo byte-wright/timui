@@ -6,52 +6,60 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-type OptionGroup[B Backend] struct {
-	t *Timui[B]
+type OptionGroupElement[B Backend, V comparable] struct {
+	t        *Timui[B]
+	selected *V
 }
 
-func (t *Timui[B]) OptionGroup(name string, selected *int) *OptionGroup[B] {
-	return &OptionGroup[B]{
-		t: t,
+func OptionGroup[B Backend, V comparable](t *Timui[B], name string, selected *V) *OptionGroupElement[B, V] {
+	t.id.Push(name)
+
+	return &OptionGroupElement[B, V]{
+		t:        t,
+		selected: selected,
 	}
 }
 
-func (o OptionGroup[B]) Option(name string) {
-	size := g.CurrentArea().Size()
+func (o OptionGroupElement[B, V]) Option(name string, value V) bool {
+	size := o.t.CurrentArea().Size()
 
 	size.Y = 1
 
-	mouse := g.MouseInput(name, mathi.Box2{To: size})
+	mouse := o.t.MouseInput(name, mathi.Box2{To: size})
 
-	bgCol := g.Theme.Widget.BG
+	bgCol := o.t.Theme.Widget.BG
 
 	if mouse.Hovered() > 0 {
-		bgCol = g.Theme.Widget.HoverBG
+		bgCol = o.t.Theme.Widget.HoverBG
 	}
 
 	if mouse.LeftPressed() > 0 {
-		bgCol = g.Theme.Widget.InteractBG
+		bgCol = o.t.Theme.Widget.InteractBG
 	}
 
 	bgColA := bgCol.RGBA(0xff)
 
-	if *checked {
-		g.Text("[X] ", mathi.Vec2{}, g.Theme.Widget.Line.RGBA(0xff), bgColA)
+	if *o.selected == value {
+		o.t.Text("(X) ", mathi.Vec2{}, o.t.Theme.Widget.Line.RGBA(0xff), bgColA)
 	} else {
-		g.Text("[ ] ", mathi.Vec2{}, g.Theme.Widget.Line.RGBA(0xff), bgColA)
+		o.t.Text("( ) ", mathi.Vec2{}, o.t.Theme.Widget.Line.RGBA(0xff), bgColA)
 	}
 
 	pad := size.X - len(name) - 4
 
-	g.Text(name+strings.Repeat(" ", pad), mathi.Vec2{X: 4}, g.Theme.Widget.Text.RGBA(0xff), bgColA)
+	o.t.Text(name+strings.Repeat(" ", pad), mathi.Vec2{X: 4}, o.t.Theme.Widget.Text.RGBA(0xff), bgColA)
 
-	g.moveCursor(mathi.Vec2{Y: 1})
+	o.t.moveCursor(mathi.Vec2{Y: 1})
 
 	clicked := mouse.LeftReleased()
 
 	if clicked {
-		*checked = !*checked
+		*o.selected = value
 	}
 
 	return clicked
+}
+
+func (o OptionGroupElement[B, V]) Finish() {
+	o.t.id.Pop()
 }

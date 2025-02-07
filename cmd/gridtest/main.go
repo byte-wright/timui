@@ -112,7 +112,7 @@ func main() {
 			checkboxes()
 
 			cols.Next()
-			tui.Label("AAAAA")
+			options()
 			cols.Next()
 			tui.Label("BBBB")
 
@@ -230,6 +230,18 @@ func checkboxes() {
 	tui.Checkbox("Alpha", &checkedA)
 	tui.Checkbox("Beta.1", &checkedB)
 	tui.Checkbox("Beta.2", &checkedB)
+}
+
+var selectedOption = "a"
+
+func options() {
+	og := timui.OptionGroup(tui, "aaa", &selectedOption)
+
+	og.Option("Alpha", "a")
+	og.Option("Beta", "b")
+	og.Option("Gamma", "c")
+
+	og.Finish()
 }
 
 func header() {
