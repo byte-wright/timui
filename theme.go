@@ -32,7 +32,7 @@ var DefaultTheme = Theme{
 	Widget: WidgetTheme{
 		BG:         MustRGBS("#004"),
 		Text:       MustRGBS("#bbb"),
-		Line:       MustRGBS("#22f"),
+		Line:       MustRGBS("#a0a"),
 		HoverBG:    MustRGBS("#22a"),
 		InteractBG: MustRGBS("#008"),
 		FocusLine:  MustRGBS("#ffa"),

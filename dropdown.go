@@ -60,9 +60,10 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 			area.To.Y = area.From.Y + height + 2
 			g.PushArea(area)
 
-			g.Border(dropdownBordeStyleLine, g.Theme.BorderLine, g.Theme.BorderBG)
+			g.Border(dropdownBordeStyleLine, g.Theme.Widget.Line, g.Theme.Widget.BG)
 
 			pad := g.Pad(1, 1, 1, 1)
+			g.SetArea(' ', g.Theme.Widget.Text, g.Theme.Widget.BG)
 
 			g.id.Push("selection")
 
@@ -74,10 +75,8 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 
 				mi := g.MouseInput(strconv.Itoa(i), mathi.Box2{To: ma.Size()})
 
-				if mi.Hovered() > 0 {
-					fg := RGB(0xff, 0xff, 0xff)
-					bg := RGB(0x00, 0x00, 0x66)
-					g.HLine(dropdownSelectionStyle, fg, bg)
+				if mi.Hovered() > 0 || i == *selected {
+					g.HLine(dropdownSelectionStyle, g.Theme.Widget.Text, g.Theme.Widget.HoverBG)
 				}
 
 				if mi.LeftReleased() {
@@ -88,7 +87,7 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 				g.PopArea()
 
 				ma.From.X += 1
-				ma.To.X -= 1
+				ma.To.X -= 2
 
 				g.PushArea(ma)
 				dd.paint(i, dd.selected == i)
