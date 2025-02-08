@@ -72,6 +72,21 @@ func (t *Timui) SetArea(char rune, fg, bg RGBColor) {
 	}
 }
 
+func (t *Timui) SetAreaAlpha(char rune, fg, bg RGBAColor) {
+	clip := t.PeekClip()
+
+	area := t.CurrentArea()
+
+	for y := area.From.Y; y < area.To.Y; y++ {
+		for x := area.From.X; x < area.To.X; x++ {
+			p := mathi.Vec2{X: x, Y: y}
+			if clip.Contains(p) {
+				t.front.Set(p, char, uint32(fg), uint32(bg))
+			}
+		}
+	}
+}
+
 func (t *Timui) SetBorder(pos mathi.Vec2, char rune, fg, bg RGBColor) {
 	clip := t.PeekClip()
 	if clip.Contains(pos) {

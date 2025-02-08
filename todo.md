@@ -1,7 +1,7 @@
 - screen resizing [OK]
 - transparent colors [OK]
 - dropdown [OK]
-- row/column fixed widths
+- row/column fixed widths [OK]
 - modal dialog
 - drag and drop
 - scrollbars

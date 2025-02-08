@@ -18,6 +18,7 @@ var (
 	selected int
 	checkedA bool
 	checkedB bool
+	dialogA  bool
 )
 
 func main() {
@@ -114,7 +115,14 @@ func main() {
 			cols.Next()
 			options()
 			cols.Next()
-			tui.Label("BBBB")
+
+			if tui.Button("Dialog...") {
+				dialogA = true
+			}
+
+			tui.Dialog("Main DIalog!", &dialogA)
+
+			cols.Next()
 
 			cols.Finish()
 		}

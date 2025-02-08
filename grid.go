@@ -15,7 +15,7 @@ func (t *Timui) Grid() *Grid {
 	area := *t.CurrentArea()
 	originalArea := area
 
-	pad := mathi.Vec2{X: 2, Y: 1}
+	pad := mathi.Vec2{X: 1, Y: 1}
 	area.From = area.From.Add(pad)
 	area.To = area.To.Sub(pad)
 
