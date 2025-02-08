@@ -14,7 +14,6 @@ import (
 
 var (
 	count    = 0
-	tui      *timui.Timui
 	selected int
 	checkedA bool
 	checkedB bool
@@ -52,7 +51,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	tui = timui.New(backend)
+	tui := timui.New(backend)
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
@@ -77,151 +76,148 @@ func main() {
 
 		time.Sleep(time.Millisecond * 33)
 
+		render(tui)
+
+	}
+}
+
+func render(tui *timui.Timui) {
+	grid := tui.Grid()
+
+	rows := grid.Rows(timui.Split().Fixed(1, 7).Factor(1).Fixed(1))
+
+	header(tui)
+
+	rows.Next()
+
+	{
+		cols := rows.Columns(timui.Split().Fixed(12).Factor(0.3, 0.4, 0.5, 0.6, 1))
+		countButtons(tui)
+
+		cols.Next()
+
+		tui.Theme.WithBorder(timui.BorderSingle, func() {
+			subRows := cols.Rows(timui.Split().Fixed(1).Factor(1).Fixed(1))
+			tui.Dropdown("sel1", 10, &selected, func(i int, s bool) {
+				tui.Label(fmt.Sprintf("Item %v is my friend", i))
+			})
+
+			subRows.Next()
+
+			tui.Label("Select the thing")
+
+			subRows.Next()
+			tui.Label(fmt.Sprintf("sel is %v", selected))
+
+			subRows.Finish()
+		})
+
+		cols.Next()
+		checkboxes(tui)
+
+		cols.Next()
+		options(tui)
+		cols.Next()
+
+		if tui.Button("Dialog...") {
+			dialogA = true
+		}
+
+		tui.Dialog("Main DIalog!", &dialogA, func() {
+			tui.Label("Fishfingers!")
+		})
+
+		cols.Next()
+
+		cols.Finish()
+	}
+
+	rows.Next()
+
+	{
+		subCols := rows.Columns(timui.Split().Factor(1, 1))
+		leftSingleGrid(tui)
+
+		subCols.Next()
+		rightSingleGrid(tui)
+
+		subCols.Finish()
+	}
+
+	rows.Next()
+	footer(tui)
+
+	rows.Finish()
+
+	grid.Finish()
+
+	tui.Finish()
+}
+
+func leftSingleGrid(tui *timui.Timui) {
+	tui.Theme.WithBorder(timui.BorderRoundSingle, func() {
+		pad := tui.Pad(0, 1, 0, 1)
 		grid := tui.Grid()
 
-		rows := grid.Rows(timui.Split().Fixed(1, 7).Factor(1).Fixed(1))
+		tui.Theme.WithBorder(timui.BorderDouble, func() {
+			rows := grid.Rows(timui.Split().Factor(1, 1))
 
-		header()
-
-		rows.Next()
-
-		{
-			cols := rows.Columns(timui.Split().Fixed(12).Factor(0.3, 0.4, 0.5, 0.6, 1))
-			countButtons()
-
-			cols.Next()
-
-			{
-				revert := tui.Theme.UseBorder(timui.BorderSingle)
-				subRows := cols.Rows(timui.Split().Fixed(1).Factor(1).Fixed(1))
-				tui.Dropdown("sel1", 10, &selected, func(i int, s bool) {
-					tui.Label(fmt.Sprintf("Item %v is my friend", i))
-				})
+			tui.Theme.WithBorder(timui.BorderSingle, func() {
+				subRows := rows.Rows(timui.Split().Fixed(1).Factor(1))
+				tui.Label("Title")
 
 				subRows.Next()
-
-				tui.Label("Select the thing")
-
-				subRows.Next()
-				tui.Label(fmt.Sprintf("sel is %v", selected))
+				tui.Label("Content...")
+				tui.Label("Content...")
+				tui.Label("Content...")
 
 				subRows.Finish()
-				revert()
-			}
+			})
 
-			cols.Next()
-			checkboxes()
+			rows.Next()
+			tui.Label("BOTTOM")
 
-			cols.Next()
-			options()
-			cols.Next()
-
-			if tui.Button("Dialog...") {
-				dialogA = true
-			}
-
-			tui.Dialog("Main DIalog!", &dialogA)
-
-			cols.Next()
-
-			cols.Finish()
-		}
-
-		rows.Next()
-
-		{
-			subCols := rows.Columns(timui.Split().Factor(1, 1))
-			leftSingleGrid()
-
-			subCols.Next()
-			rightSingleGrid()
-
-			subCols.Finish()
-		}
-
-		rows.Next()
-		footer()
-
-		rows.Finish()
+			rows.Finish()
+		})
 
 		grid.Finish()
-
-		tui.Finish()
-	}
+		pad.Finish()
+	})
 }
 
-func leftSingleGrid() {
-	revert := tui.Theme.UseBorder(timui.BorderRoundSingle)
-	pad := tui.Pad(0, 1, 0, 1)
-	grid := tui.Grid()
+func rightSingleGrid(tui *timui.Timui) {
+	tui.Theme.WithBorder(timui.BorderSingle, func() {
+		pad := tui.Pad(0, 1, 0, 1)
+		grid := tui.Grid()
 
-	{
-		revert2 := tui.Theme.UseBorder(timui.BorderDouble)
-		rows := grid.Rows(timui.Split().Factor(1, 1))
+		tui.Theme.WithBorder(timui.BorderDouble, func() {
+			rows := grid.Columns(timui.Split().Factor(1, 1))
 
-		{
-			revert3 := tui.Theme.UseBorder(timui.BorderSingle)
-			subRows := rows.Rows(timui.Split().Fixed(1).Factor(1))
-			tui.Label("Title")
+			tui.Theme.WithBorder(timui.BorderSingle, func() {
+				subRows := rows.Columns(timui.Split().Fixed(1).Factor(1))
+				tui.Label("A")
+				tui.Label("B")
+				tui.Label("C")
 
-			subRows.Next()
-			tui.Label("Content...")
-			tui.Label("Content...")
-			tui.Label("Content...")
+				subRows.Next()
+				tui.Label("Content...")
+				tui.Label("Content...")
+				tui.Label("Content...")
 
-			subRows.Finish()
-			revert3()
-		}
+				subRows.Finish()
+			})
 
-		rows.Next()
-		tui.Label("BOTTOM")
+			rows.Next()
 
-		rows.Finish()
-		revert2()
-	}
+			rows.Finish()
+		})
 
-	grid.Finish()
-	pad.Finish()
-	revert()
+		grid.Finish()
+		pad.Finish()
+	})
 }
 
-func rightSingleGrid() {
-	revert := tui.Theme.UseBorder(timui.BorderSingle)
-	pad := tui.Pad(0, 1, 0, 1)
-	grid := tui.Grid()
-
-	{
-		revert2 := tui.Theme.UseBorder(timui.BorderDouble)
-		rows := grid.Columns(timui.Split().Factor(1, 1))
-
-		{
-			revert3 := tui.Theme.UseBorder(timui.BorderSingle)
-			subRows := rows.Columns(timui.Split().Fixed(1).Factor(1))
-			tui.Label("A")
-			tui.Label("B")
-			tui.Label("C")
-
-			subRows.Next()
-			tui.Label("Content...")
-			tui.Label("Content...")
-			tui.Label("Content...")
-
-			subRows.Finish()
-			revert3()
-		}
-
-		rows.Next()
-
-		rows.Finish()
-		revert2()
-	}
-
-	grid.Finish()
-	pad.Finish()
-	revert()
-}
-
-func countButtons() {
+func countButtons(tui *timui.Timui) {
 	if tui.Button("ClickMe +") {
 		count++
 	}
@@ -234,7 +230,7 @@ func countButtons() {
 	tui.Label(fmt.Sprintf("Sqrd : %v", count*count))
 }
 
-func checkboxes() {
+func checkboxes(tui *timui.Timui) {
 	tui.Checkbox("Alpha", &checkedA)
 	tui.Checkbox("Beta.1", &checkedB)
 	tui.Checkbox("Beta.2", &checkedB)
@@ -242,20 +238,18 @@ func checkboxes() {
 
 var selectedOption = "a"
 
-func options() {
-	og := timui.OptionGroup(tui, "aaa", &selectedOption)
-
-	og.Option("Alpha", "a")
-	og.Option("Beta", "b")
-	og.Option("Gamma", "c")
-
-	og.Finish()
+func options(tui *timui.Timui) {
+	timui.OptionGroup(tui, "aaa", &selectedOption, func(og *timui.OptionGroupElement[string]) {
+		og.Option("Alpha", "a")
+		og.Option("Beta", "b")
+		og.Option("Gamma", "c")
+	})
 }
 
-func header() {
+func header(tui *timui.Timui) {
 	tui.Label("I'm the Header!")
 }
 
-func footer() {
+func footer(tui *timui.Timui) {
 	tui.Label("I'm the Foooter!")
 }

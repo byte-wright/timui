@@ -4,7 +4,7 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-func (t *Timui) Dialog(title string, visible *bool) {
+func (t *Timui) Dialog(title string, visible *bool, content func()) {
 	did := t.id.Push(title)
 
 	if *visible {
@@ -36,7 +36,7 @@ func (t *Timui) Dialog(title string, visible *bool) {
 			title := rows.Columns(Split().Factor(1).Fixed(3))
 
 			tp := t.Pad(0, 1, 0, 1)
-			t.Label("FISDH!")
+			t.Label("title")
 			tp.Finish()
 
 			title.Next()
@@ -53,7 +53,7 @@ func (t *Timui) Dialog(title string, visible *bool) {
 
 			rows.Next()
 			cp := t.Pad(0, 1, 0, 1)
-			t.Label("cntnt")
+			content()
 			cp.Finish()
 
 			rows.Finish()

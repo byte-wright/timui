@@ -5,9 +5,8 @@ import (
 )
 
 type Screen struct {
-	Size     mathi.Vec2
-	gridSize mathi.Vec2
-	chars    []cell
+	Size  mathi.Vec2
+	Chars []cell
 }
 
 type cell struct {
@@ -20,9 +19,8 @@ type cell struct {
 
 func NewScreen(size mathi.Vec2) *Screen {
 	return &Screen{
-		Size:     size,
-		gridSize: size,
-		chars:    make([]cell, size.X*size.Y),
+		Size:  size,
+		Chars: make([]cell, size.X*size.Y),
 	}
 }
 
@@ -31,41 +29,8 @@ func (s *Screen) Resize(size mathi.Vec2) {
 		return
 	}
 
-	if s.Size.X >= size.X && s.Size.Y >= size.Y {
-		// if we shrink the size, just set new size
-		s.Size = size
-		return
-	}
-
-	if s.gridSize.X >= size.X && s.gridSize.Y >= size.Y {
-		// if grid size is already larger
-
-		if size.X > s.Size.X {
-			// extend width
-			for y := 0; y < s.Size.Y; y++ {
-				for x := s.Size.X; x < size.X; x++ {
-					s.chars[y*s.gridSize.X+x].Char = 0
-				}
-			}
-			s.Size.X = size.X
-		}
-
-		if size.Y > s.Size.Y {
-			for y := s.Size.Y; y < size.Y; y++ {
-				for x := 0; x < s.Size.X; x++ {
-					s.chars[y*s.gridSize.X+x].Char = 0
-				}
-			}
-
-			s.Size.Y = size.Y
-		}
-
-		return
-	}
-	// brute force
 	s.Size = size
-	s.gridSize = size
-	s.chars = make([]cell, size.X*size.Y)
+	s.Chars = make([]cell, size.X*size.Y)
 }
 
 func (s *Screen) Get(pos mathi.Vec2) cell {
@@ -73,8 +38,8 @@ func (s *Screen) Get(pos mathi.Vec2) cell {
 		return cell{}
 	}
 
-	i := pos.Y*s.gridSize.X + pos.X
-	return s.chars[i]
+	i := pos.Y*s.Size.X + pos.X
+	return s.Chars[i]
 }
 
 // set paints the character, foreground and background
@@ -85,34 +50,36 @@ func (s *Screen) Set(pos mathi.Vec2, char rune, fg, bg uint32) {
 		return
 	}
 
-	i := pos.Y*s.gridSize.X + pos.X
+	i := pos.Y*s.Size.X + pos.X
 
 	if char != 0 {
-		s.chars[i].Char = char
+		s.Chars[i].Char = char
 	}
 
-	s.chars[i].FG = blendColor(s.chars[i].FG, fg)
-	s.chars[i].BG = blendColor(s.chars[i].BG, bg)
+	s.Chars[i].FG = blendColor(s.Chars[i].FG, fg)
+	s.Chars[i].BG = blendColor(s.Chars[i].BG, bg)
 }
 
-// clear sets the whole screen to given values.
+// SetScreen sets the whole screen to given values.
 func (s *Screen) SetScreen(char rune, fg, bg uint32) {
-	for y := 0; y < s.Size.Y; y++ {
-		for x := 0; x < s.Size.X; x++ {
-			i := y*s.gridSize.X + x
-
-			s.chars[i].Char = char
-			s.chars[i].FG = fg
-			s.chars[i].BG = bg
-		}
+	cell := cell{Char: char, FG: fg, BG: bg}
+	for i := range s.Chars {
+		s.Chars[i] = cell
 	}
 }
 
 func blendColor(base uint32, top uint32) uint32 {
+	a := (top >> 24) & 0xff
+	if a == 0 {
+		return base
+	}
+	if a == 255 {
+		return top & 0xffffff
+	}
+
 	tr := (top >> 16) & 0xff
 	tg := (top >> 8) & 0xff
 	tb := (top) & 0xff
-	a := (top >> 24) & 0xff
 
 	br := (base >> 16) & 0xff
 	bg := (base >> 8) & 0xff

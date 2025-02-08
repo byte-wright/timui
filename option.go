@@ -11,13 +11,15 @@ type OptionGroupElement[V comparable] struct {
 	selected *V
 }
 
-func OptionGroup[V comparable](t *Timui, name string, selected *V) *OptionGroupElement[V] {
+func OptionGroup[V comparable](t *Timui, name string, selected *V, f func(*OptionGroupElement[V])) {
 	t.id.Push(name)
 
-	return &OptionGroupElement[V]{
+	f(&OptionGroupElement[V]{
 		t:        t,
 		selected: selected,
-	}
+	})
+
+	t.id.Pop()
 }
 
 func (o OptionGroupElement[V]) Option(name string, value V) bool {
@@ -58,8 +60,4 @@ func (o OptionGroupElement[V]) Option(name string, value V) bool {
 	}
 
 	return clicked
-}
-
-func (o OptionGroupElement[V]) Finish() {
-	o.t.id.Pop()
 }

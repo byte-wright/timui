@@ -71,15 +71,13 @@ func (t *Timui) Finish() {
 		f()
 	}
 
-	for y := 0; y < t.front.Size.Y; y++ {
-		for x := 0; x < t.front.Size.X; x++ {
-			pos := mathi.Vec2{X: x, Y: y}
-
-			if t.front.Get(pos) != t.back.Get(pos) {
-				fc := t.front.Get(pos)
-				t.backend.Set(pos, fc.Char, uint32(fc.FG), uint32(fc.BG))
-			}
+	for i := range t.front.Chars {
+		fc := t.front.Chars[i]
+		if fc != t.back.Chars[i] {
+			pos := mathi.Vec2{X: i % t.front.Size.X, Y: i / t.front.Size.X}
+			t.backend.Set(pos, fc.Char, uint32(fc.FG), uint32(fc.BG))
 		}
+
 	}
 
 	t.backend.Render()

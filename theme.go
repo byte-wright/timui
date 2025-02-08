@@ -70,11 +70,11 @@ var BorderBasic = BorderStyle{
 	Horizontal: [3]rune{'+', '-', '+'},
 }
 
-func (t *Theme) UseBorder(b BorderStyle) func() {
+func (t *Theme) WithBorder(b BorderStyle, content func()) {
 	before := t.BorderStyle
 	t.BorderStyle = b
 
-	return func() {
-		t.BorderStyle = before
-	}
+	content()
+
+	t.BorderStyle = before
 }
