@@ -6,21 +6,21 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-type OptionGroupElement[B Backend, V comparable] struct {
-	t        *Timui[B]
+type OptionGroupElement[V comparable] struct {
+	t        *Timui
 	selected *V
 }
 
-func OptionGroup[B Backend, V comparable](t *Timui[B], name string, selected *V) *OptionGroupElement[B, V] {
+func OptionGroup[V comparable](t *Timui, name string, selected *V) *OptionGroupElement[V] {
 	t.id.Push(name)
 
-	return &OptionGroupElement[B, V]{
+	return &OptionGroupElement[V]{
 		t:        t,
 		selected: selected,
 	}
 }
 
-func (o OptionGroupElement[B, V]) Option(name string, value V) bool {
+func (o OptionGroupElement[V]) Option(name string, value V) bool {
 	size := o.t.CurrentArea().Size()
 
 	size.Y = 1
@@ -60,6 +60,6 @@ func (o OptionGroupElement[B, V]) Option(name string, value V) bool {
 	return clicked
 }
 
-func (o OptionGroupElement[B, V]) Finish() {
+func (o OptionGroupElement[V]) Finish() {
 	o.t.id.Pop()
 }

@@ -4,12 +4,12 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-type Panel[B Backend] struct {
-	t    *Timui[B]
+type Panel struct {
+	t    *Timui
 	area mathi.Box2
 }
 
-func (t *Timui[B]) Panel() *Panel[B] {
+func (t *Timui) Panel() *Panel {
 	t.Border(t.Theme.BorderStyle.Rect, t.Theme.BorderLine, t.Theme.BorderBG)
 
 	area := *t.CurrentArea()
@@ -21,13 +21,13 @@ func (t *Timui[B]) Panel() *Panel[B] {
 
 	t.PushArea(area)
 
-	return &Panel[B]{
+	return &Panel{
 		t:    t,
 		area: originalArea,
 	}
 }
 
-func (p *Panel[B]) HLine() {
+func (p *Panel) HLine() {
 	pos := p.t.CurrentArea()
 	y := pos.From.Y
 
@@ -41,7 +41,7 @@ func (p *Panel[B]) HLine() {
 	p.t.PopArea()
 }
 
-func (p *Panel[B]) Header() {
+func (p *Panel) Header() {
 	p.t.PopArea()
 	area := *p.t.CurrentArea()
 	area.To.Y = area.From.Y + 1
@@ -50,6 +50,6 @@ func (p *Panel[B]) Header() {
 	p.t.PushArea(area)
 }
 
-func (p *Panel[B]) Finish() {
+func (p *Panel) Finish() {
 	p.t.PopArea()
 }

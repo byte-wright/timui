@@ -1,10 +1,10 @@
 package timui
 
-type Pad[B Backend] struct {
-	t *Timui[B]
+type Pad struct {
+	t *Timui
 }
 
-func (t *Timui[B]) Pad(top, right, bottom, left int) *Pad[B] {
+func (t *Timui) Pad(top, right, bottom, left int) *Pad {
 	area := *t.CurrentArea()
 
 	area.From.X += left
@@ -14,11 +14,11 @@ func (t *Timui[B]) Pad(top, right, bottom, left int) *Pad[B] {
 
 	t.PushArea(area)
 
-	return &Pad[B]{
+	return &Pad{
 		t: t,
 	}
 }
 
-func (p *Pad[B]) Finish() {
+func (p *Pad) Finish() {
 	p.t.PopArea()
 }

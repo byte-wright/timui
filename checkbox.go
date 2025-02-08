@@ -6,7 +6,7 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-func (g *Timui[B]) Checkbox(name string, checked *bool) bool {
+func (g *Timui) Checkbox(name string, checked *bool) bool {
 	size := g.CurrentArea().Size()
 
 	size.Y = 1

@@ -4,14 +4,14 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-type Rows[B Backend] struct {
-	g         *Timui[B]
+type Rows struct {
+	g         *Timui
 	positions []splitRange
 	area      mathi.Box2
 	row       int
 }
 
-func (g *Timui[B]) Rows(pos *SplitOptions) *Rows[B] {
+func (g *Timui) Rows(pos *SplitOptions) *Rows {
 	positions := pos.calculatePositions(g.CurrentArea().Size().Y)
 
 	area := g.CurrentArea()
@@ -22,14 +22,14 @@ func (g *Timui[B]) Rows(pos *SplitOptions) *Rows[B] {
 
 	g.PushArea(firstArea)
 
-	return &Rows[B]{
+	return &Rows{
 		g:         g,
 		positions: positions,
 		area:      *area,
 	}
 }
 
-func (s *Rows[B]) Next() {
+func (s *Rows) Next() {
 	s.g.PopArea()
 	s.row += 1
 
@@ -41,6 +41,6 @@ func (s *Rows[B]) Next() {
 	s.g.PushArea(area)
 }
 
-func (s *Rows[B]) Finish() {
+func (s *Rows) Finish() {
 	s.g.PopArea()
 }

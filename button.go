@@ -6,7 +6,7 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-func (g *Timui[B]) Button(name string) bool {
+func (g *Timui) Button(name string) bool {
 	area := g.CurrentArea()
 	size := area.Size()
 

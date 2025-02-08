@@ -14,24 +14,24 @@ var (
 	dropdownBordeStyleLine = [6]rune{'─', '│', '┌', '┐', '└', '┘'}
 )
 
-type dropdown[B Backend] struct {
-	g        *Timui[B]
+type dropdown struct {
+	g        *Timui
 	open     bool
 	elements int
 	selected int
 	paint    func(i int, selected bool)
 }
 
-type dropdownManager[B Backend] struct {
-	lastDropdowns map[internal.ID]*dropdown[B]
-	nextDropdowns map[internal.ID]*dropdown[B]
+type dropdownManager struct {
+	lastDropdowns map[internal.ID]*dropdown
+	nextDropdowns map[internal.ID]*dropdown
 }
 
-func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i int, s bool)) {
+func (g *Timui) Dropdown(id string, elements int, selected *int, paint func(i int, s bool)) {
 	cid := g.id.Push(id)
 	dd, has := g.dropdownManager.lastDropdowns[cid]
 	if !has {
-		dd = &dropdown[B]{g: g}
+		dd = &dropdown{g: g}
 	}
 
 	dd.elements = elements
@@ -105,7 +105,7 @@ func (g *Timui[B]) Dropdown(id string, elements int, selected *int, paint func(i
 	}
 }
 
-func (d *dropdown[B]) paintSelection(theme *Theme) {
+func (d *dropdown) paintSelection(theme *Theme) {
 	remWidth := d.g.CurrentArea().Size().X
 
 	size := mathi.Vec2{X: remWidth, Y: 1}
@@ -144,14 +144,14 @@ func (d *dropdown[B]) paintSelection(theme *Theme) {
 	d.g.moveCursor(mathi.Vec2{Y: 1})
 }
 
-func newDropdownManager[B Backend]() *dropdownManager[B] {
-	return &dropdownManager[B]{
-		lastDropdowns: map[internal.ID]*dropdown[B]{},
-		nextDropdowns: map[internal.ID]*dropdown[B]{},
+func newDropdownManager() *dropdownManager {
+	return &dropdownManager{
+		lastDropdowns: map[internal.ID]*dropdown{},
+		nextDropdowns: map[internal.ID]*dropdown{},
 	}
 }
 
-func (m *dropdownManager[B]) finish(_ *Timui[B]) {
+func (m *dropdownManager) finish(_ *Timui) {
 	m.lastDropdowns, m.nextDropdowns = m.nextDropdowns, m.lastDropdowns
-	m.nextDropdowns = map[internal.ID]*dropdown[B]{}
+	m.nextDropdowns = map[internal.ID]*dropdown{}
 }

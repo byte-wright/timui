@@ -4,12 +4,12 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-type Grid[B Backend] struct {
-	t    *Timui[B]
+type Grid struct {
+	t    *Timui
 	area mathi.Box2
 }
 
-func (t *Timui[B]) Grid() *Grid[B] {
+func (t *Timui) Grid() *Grid {
 	t.Border(t.Theme.BorderStyle.Rect, t.Theme.BorderLine, t.Theme.BorderBG)
 
 	area := *t.CurrentArea()
@@ -21,24 +21,24 @@ func (t *Timui[B]) Grid() *Grid[B] {
 
 	t.PushArea(area)
 
-	return &Grid[B]{
+	return &Grid{
 		t:    t,
 		area: originalArea,
 	}
 }
 
-func (g *Grid[B]) Finish() {
+func (g *Grid) Finish() {
 	g.t.PopArea()
 }
 
-type GridRows[B Backend] struct {
-	t         *Timui[B]
+type GridRows struct {
+	t         *Timui
 	positions []splitRange
 	area      mathi.Box2
 	row       int
 }
 
-func (g *Grid[B]) Rows(pos *SplitOptions) *GridRows[B] {
+func (g *Grid) Rows(pos *SplitOptions) *GridRows {
 	if pos.padding != 0 {
 		panic("grid rows padding must be zero")
 	}
@@ -47,7 +47,7 @@ func (g *Grid[B]) Rows(pos *SplitOptions) *GridRows[B] {
 
 	positions := pos.calculatePositions(g.area.Size().Y)
 
-	gridRows := &GridRows[B]{
+	gridRows := &GridRows{
 		t:         g.t,
 		positions: positions,
 		area:      g.area,
@@ -65,7 +65,7 @@ func (g *Grid[B]) Rows(pos *SplitOptions) *GridRows[B] {
 	return gridRows
 }
 
-func (g *Grid[B]) Columns(pos *SplitOptions) *GridColumns[B] {
+func (g *Grid) Columns(pos *SplitOptions) *GridColumns {
 	if pos.padding != 0 {
 		panic("grid rows padding must be zero")
 	}
@@ -74,7 +74,7 @@ func (g *Grid[B]) Columns(pos *SplitOptions) *GridColumns[B] {
 
 	positions := pos.calculatePositions(g.area.Size().X)
 
-	gridRows := &GridColumns[B]{
+	gridRows := &GridColumns{
 		t:         g.t,
 		positions: positions,
 		area:      g.area,
@@ -92,7 +92,7 @@ func (g *Grid[B]) Columns(pos *SplitOptions) *GridColumns[B] {
 	return gridRows
 }
 
-func (g *GridRows[B]) Next() {
+func (g *GridRows) Next() {
 	g.t.PopArea()
 	g.row += 1
 
@@ -112,7 +112,7 @@ func (g *GridRows[B]) Next() {
 	g.t.PushArea(area)
 }
 
-func (g *GridRows[B]) currentArea() mathi.Box2 {
+func (g *GridRows) currentArea() mathi.Box2 {
 	area := g.area
 	yStart := area.From.Y
 	area.From.Y = yStart + g.positions[g.row].from
@@ -121,7 +121,7 @@ func (g *GridRows[B]) currentArea() mathi.Box2 {
 	return area
 }
 
-func (g *GridRows[B]) currentCompleteArea() mathi.Box2 {
+func (g *GridRows) currentCompleteArea() mathi.Box2 {
 	area := g.currentArea()
 	area.From.Y -= 1
 	area.To.Y += 1
@@ -129,18 +129,18 @@ func (g *GridRows[B]) currentCompleteArea() mathi.Box2 {
 	return area
 }
 
-func (g *GridRows[B]) Finish() {
+func (g *GridRows) Finish() {
 	g.t.PopArea()
 }
 
-type GridColumns[B Backend] struct {
-	t         *Timui[B]
+type GridColumns struct {
+	t         *Timui
 	positions []splitRange
 	area      mathi.Box2
 	column    int
 }
 
-func (g *GridRows[B]) Columns(pos *SplitOptions) *GridColumns[B] {
+func (g *GridRows) Columns(pos *SplitOptions) *GridColumns {
 	if pos.padding != 0 {
 		panic("grid columns padding must be zero")
 	}
@@ -149,7 +149,7 @@ func (g *GridRows[B]) Columns(pos *SplitOptions) *GridColumns[B] {
 
 	positions := pos.calculatePositions(g.area.Size().X)
 
-	gridColumns := &GridColumns[B]{
+	gridColumns := &GridColumns{
 		t:         g.t,
 		positions: positions,
 		area:      g.currentCompleteArea(),
@@ -167,7 +167,7 @@ func (g *GridRows[B]) Columns(pos *SplitOptions) *GridColumns[B] {
 	return gridColumns
 }
 
-func (g *GridRows[B]) Rows(pos *SplitOptions) *GridRows[B] {
+func (g *GridRows) Rows(pos *SplitOptions) *GridRows {
 	if pos.padding != 0 {
 		panic("grid columns padding must be zero")
 	}
@@ -176,7 +176,7 @@ func (g *GridRows[B]) Rows(pos *SplitOptions) *GridRows[B] {
 
 	positions := pos.calculatePositions(g.currentCompleteArea().Size().Y)
 
-	gridRows := &GridRows[B]{
+	gridRows := &GridRows{
 		t:         g.t,
 		positions: positions,
 		area:      g.currentCompleteArea(),
@@ -194,7 +194,7 @@ func (g *GridRows[B]) Rows(pos *SplitOptions) *GridRows[B] {
 	return gridRows
 }
 
-func (g *GridColumns[B]) Next() {
+func (g *GridColumns) Next() {
 	g.t.PopArea()
 	g.column += 1
 
@@ -215,7 +215,7 @@ func (g *GridColumns[B]) Next() {
 	g.t.PushArea(area)
 }
 
-func (g *GridColumns[B]) Rows(pos *SplitOptions) *GridRows[B] {
+func (g *GridColumns) Rows(pos *SplitOptions) *GridRows {
 	if pos.padding != 0 {
 		panic("grid rows padding must be zero")
 	}
@@ -224,7 +224,7 @@ func (g *GridColumns[B]) Rows(pos *SplitOptions) *GridRows[B] {
 
 	positions := pos.calculatePositions(g.area.Size().Y)
 
-	gridRows := &GridRows[B]{
+	gridRows := &GridRows{
 		t:         g.t,
 		positions: positions,
 		area:      g.currentCompleteArea(),
@@ -242,7 +242,7 @@ func (g *GridColumns[B]) Rows(pos *SplitOptions) *GridRows[B] {
 	return gridRows
 }
 
-func (g *GridColumns[B]) Columns(pos *SplitOptions) *GridColumns[B] {
+func (g *GridColumns) Columns(pos *SplitOptions) *GridColumns {
 	if pos.padding != 0 {
 		panic("grid rows padding must be zero")
 	}
@@ -251,7 +251,7 @@ func (g *GridColumns[B]) Columns(pos *SplitOptions) *GridColumns[B] {
 
 	positions := pos.calculatePositions(g.area.Size().X)
 
-	gridColumns := &GridColumns[B]{
+	gridColumns := &GridColumns{
 		t:         g.t,
 		positions: positions,
 		area:      g.currentCompleteArea(),
@@ -269,7 +269,7 @@ func (g *GridColumns[B]) Columns(pos *SplitOptions) *GridColumns[B] {
 	return gridColumns
 }
 
-func (g *GridColumns[B]) currentArea() mathi.Box2 {
+func (g *GridColumns) currentArea() mathi.Box2 {
 	area := g.area
 	area.From.X = g.area.From.X + g.positions[g.column].from
 	area.To.X = g.area.From.X + g.positions[g.column].to
@@ -277,7 +277,7 @@ func (g *GridColumns[B]) currentArea() mathi.Box2 {
 	return area
 }
 
-func (g *GridColumns[B]) currentCompleteArea() mathi.Box2 {
+func (g *GridColumns) currentCompleteArea() mathi.Box2 {
 	area := g.currentArea()
 	area.From.X -= 1
 	area.To.X += 1
@@ -285,6 +285,6 @@ func (g *GridColumns[B]) currentCompleteArea() mathi.Box2 {
 	return area
 }
 
-func (g *GridColumns[B]) Finish() {
+func (g *GridColumns) Finish() {
 	g.t.PopArea()
 }

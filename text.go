@@ -4,7 +4,7 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-func (t *Timui[B]) Text(name string, pos mathi.Vec2, fg, bg RGBAColor) {
+func (t *Timui) Text(name string, pos mathi.Vec2, fg, bg RGBAColor) {
 	p := t.CurrentArea().From.Add(pos)
 
 	for i, r := range []rune(name) {
@@ -12,7 +12,7 @@ func (t *Timui[B]) Text(name string, pos mathi.Vec2, fg, bg RGBAColor) {
 	}
 }
 
-func (t *Timui[B]) Label(name string) {
+func (t *Timui) Label(name string) {
 	w := t.CurrentArea().Size().X
 
 	if len(name) > w+1 {

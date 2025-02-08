@@ -5,8 +5,8 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-type Timui[B Backend] struct {
-	backend B
+type Timui struct {
+	backend Backend
 	front   *internal.Screen
 	back    *internal.Screen
 
@@ -16,8 +16,8 @@ type Timui[B Backend] struct {
 
 	id                internal.IDManager
 	clipManager       clipManager
-	mouseInputManager mouseInputManager[B]
-	dropdownManager   dropdownManager[B]
+	mouseInputManager mouseInputManager
+	dropdownManager   dropdownManager
 
 	Theme Theme
 }
@@ -37,13 +37,13 @@ type Backend interface {
 	Render()
 }
 
-func New[B Backend](backend B) *Timui[B] {
+func New(backend Backend) *Timui {
 	size := backend.Size()
 
 	front := internal.NewScreen(size)
 	front.SetScreen(' ', 0, 0)
 
-	tui := &Timui[B]{
+	tui := &Timui{
 		backend: backend,
 		front:   front,
 		back:    internal.NewScreen(size),
@@ -51,8 +51,8 @@ func New[B Backend](backend B) *Timui[B] {
 		area:              []mathi.Box2{},
 		id:                *internal.NewIDManager(),
 		clipManager:       *newClipManager(),
-		mouseInputManager: *newMouseInputManager[B](),
-		dropdownManager:   *newDropdownManager[B](),
+		mouseInputManager: *newMouseInputManager(),
+		dropdownManager:   *newDropdownManager(),
 
 		Theme: DefaultTheme,
 	}
@@ -62,11 +62,11 @@ func New[B Backend](backend B) *Timui[B] {
 	return tui
 }
 
-func (t *Timui[B]) runAfter(f func()) {
+func (t *Timui) runAfter(f func()) {
 	t.after = append(t.after, f)
 }
 
-func (t *Timui[B]) Finish() {
+func (t *Timui) Finish() {
 	for _, f := range t.after {
 		f()
 	}
@@ -96,7 +96,7 @@ func (t *Timui[B]) Finish() {
 }
 
 // finish is called after each pass and also once before the first pass
-func (t *Timui[B]) finish() {
+func (t *Timui) finish() {
 	t.area = t.area[:0]
 	t.area = append(t.area, mathi.Box2{To: t.backend.Size()})
 
@@ -106,22 +106,22 @@ func (t *Timui[B]) finish() {
 	t.after = t.after[:0]
 }
 
-func (t *Timui[B]) CurrentArea() *mathi.Box2 {
+func (t *Timui) CurrentArea() *mathi.Box2 {
 	return &t.area[len(t.area)-1]
 }
 
-func (t *Timui[B]) PushArea(area mathi.Box2) {
+func (t *Timui) PushArea(area mathi.Box2) {
 	t.area = append(t.area, area)
 }
 
-func (t *Timui[B]) PopArea() {
+func (t *Timui) PopArea() {
 	t.area = t.area[:len(t.area)-1]
 }
 
-func (t *Timui[B]) GetMousePosition() mathi.Vec2 {
+func (t *Timui) GetMousePosition() mathi.Vec2 {
 	return t.backend.MousePosition()
 }
 
-func (t *Timui[B]) moveCursor(delta mathi.Vec2) {
+func (t *Timui) moveCursor(delta mathi.Vec2) {
 	t.CurrentArea().From = t.CurrentArea().From.Add(delta)
 }

@@ -14,7 +14,7 @@ import (
 
 var (
 	count    = 0
-	tui      *timui.Timui[*tcell.TCellBackend]
+	tui      *timui.Timui
 	selected int
 	checkedA bool
 	checkedB bool

@@ -2,7 +2,7 @@ package timui
 
 import "gitlab.com/bytewright/gmath/mathi"
 
-func (t *Timui[B]) Border(style [6]rune, fg, bg RGBColor) {
+func (t *Timui) Border(style [6]rune, fg, bg RGBColor) {
 	c := t.CurrentArea()
 
 	for x := c.From.X + 1; x < c.To.X-1; x++ {
@@ -21,7 +21,7 @@ func (t *Timui[B]) Border(style [6]rune, fg, bg RGBColor) {
 	t.SetBorder(mathi.Vec2{X: c.To.X - 1, Y: c.To.Y - 1}, style[5], fg, bg)
 }
 
-func (t *Timui[B]) HLine(style [3]rune, fg, bg RGBColor) {
+func (t *Timui) HLine(style [3]rune, fg, bg RGBColor) {
 	c := t.CurrentArea()
 
 	for x := c.From.X + 1; x < c.To.X-1; x++ {
@@ -32,7 +32,7 @@ func (t *Timui[B]) HLine(style [3]rune, fg, bg RGBColor) {
 	t.SetBorder(mathi.Vec2{X: c.To.X - 1, Y: c.From.Y}, style[2], fg, bg)
 }
 
-func (t *Timui[B]) VLine(style [3]rune, fg, bg RGBColor) {
+func (t *Timui) VLine(style [3]rune, fg, bg RGBColor) {
 	c := t.CurrentArea()
 
 	for y := c.From.Y + 1; y < c.To.Y-1; y++ {
@@ -43,21 +43,21 @@ func (t *Timui[B]) VLine(style [3]rune, fg, bg RGBColor) {
 	t.SetBorder(mathi.Vec2{X: c.From.X, Y: c.To.Y - 1}, style[2], fg, bg)
 }
 
-func (t *Timui[B]) SetAlpha(pos mathi.Vec2, char rune, fg, bg RGBAColor) {
+func (t *Timui) SetAlpha(pos mathi.Vec2, char rune, fg, bg RGBAColor) {
 	clip := t.PeekClip()
 	if clip.Contains(pos) {
 		t.front.Set(pos, char, uint32(fg), uint32(bg))
 	}
 }
 
-func (t *Timui[B]) Set(pos mathi.Vec2, char rune, fg, bg RGBColor) {
+func (t *Timui) Set(pos mathi.Vec2, char rune, fg, bg RGBColor) {
 	clip := t.PeekClip()
 	if clip.Contains(pos) {
 		t.front.Set(pos, char, uint32(fg.RGBA(0xff)), uint32(bg.RGBA(0xff)))
 	}
 }
 
-func (t *Timui[B]) SetArea(char rune, fg, bg RGBColor) {
+func (t *Timui) SetArea(char rune, fg, bg RGBColor) {
 	clip := t.PeekClip()
 
 	area := t.CurrentArea()
@@ -72,7 +72,7 @@ func (t *Timui[B]) SetArea(char rune, fg, bg RGBColor) {
 	}
 }
 
-func (t *Timui[B]) SetBorder(pos mathi.Vec2, char rune, fg, bg RGBColor) {
+func (t *Timui) SetBorder(pos mathi.Vec2, char rune, fg, bg RGBColor) {
 	clip := t.PeekClip()
 	if clip.Contains(pos) {
 		current := t.front.Get(pos).Char

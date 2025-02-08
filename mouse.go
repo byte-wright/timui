@@ -15,7 +15,7 @@ type MouseInput struct {
 	leftReleased   bool
 }
 
-type mouseInputManager[B Backend] struct {
+type mouseInputManager struct {
 	lastInputs map[internal.ID]*MouseInput
 	nextInputs map[internal.ID]*MouseInput
 
@@ -23,7 +23,7 @@ type mouseInputManager[B Backend] struct {
 	lastUnderCursor *MouseInput
 }
 
-func (g *Timui[B]) MouseInput(id string, area mathi.Box2) *MouseInput {
+func (g *Timui) MouseInput(id string, area mathi.Box2) *MouseInput {
 	cid := g.id.Push(id)
 	mouseInput, has := g.mouseInputManager.lastInputs[cid]
 	if !has {
@@ -75,14 +75,14 @@ func (m *MouseInput) LeftReleased() bool {
 	return m.leftReleased
 }
 
-func newMouseInputManager[B Backend]() *mouseInputManager[B] {
-	return &mouseInputManager[B]{
+func newMouseInputManager() *mouseInputManager {
+	return &mouseInputManager{
 		lastInputs: map[internal.ID]*MouseInput{},
 		nextInputs: map[internal.ID]*MouseInput{},
 	}
 }
 
-func (m *mouseInputManager[B]) finish(g *Timui[B]) {
+func (m *mouseInputManager) finish(g *Timui) {
 	m.lastUnderCursor = m.underCursor
 
 	if m.underCursor != nil {
