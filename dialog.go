@@ -11,7 +11,7 @@ func (t *Timui) Dialog(title string, visible *bool, content func()) {
 		t.runAfter(func() {
 			t.id.PushID(did)
 
-			modal := t.MouseInput("modal", *t.CurrentArea())
+			modal := t.MouseInput("modal")
 			if modal.LeftReleased() {
 				*visible = false
 			}
@@ -25,7 +25,7 @@ func (t *Timui) Dialog(title string, visible *bool, content func()) {
 
 			t.PushArea(area)
 
-			t.MouseInput("dialog", mathi.NewBox2FromSize(mathi.Vec2{}, area.Size()))
+			t.MouseInput("dialog") // to cancel the modal backdrop close click
 
 			grid := t.Grid()
 
@@ -41,7 +41,7 @@ func (t *Timui) Dialog(title string, visible *bool, content func()) {
 
 			title.Next()
 
-			close := t.MouseInput("close", mathi.Box2{From: mathi.Vec2{}, To: mathi.Vec2{X: 3, Y: 1}})
+			close := t.MouseInputForSize("close", mathi.Vec2{X: 3, Y: 1})
 			if close.LeftReleased() {
 				*visible = false
 			}

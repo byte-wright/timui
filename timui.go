@@ -18,6 +18,7 @@ type Timui struct {
 	clipManager       clipManager
 	mouseInputManager mouseInputManager
 	dropdownManager   dropdownManager
+	draggableManager  draggableManager
 
 	Theme Theme
 }
@@ -53,6 +54,7 @@ func New(backend Backend) *Timui {
 		clipManager:       *newClipManager(),
 		mouseInputManager: *newMouseInputManager(),
 		dropdownManager:   *newDropdownManager(),
+		draggableManager:  *newDraggableManager(),
 
 		Theme: DefaultTheme,
 	}
@@ -100,6 +102,7 @@ func (t *Timui) finish() {
 
 	t.mouseInputManager.finish(t)
 	t.dropdownManager.finish(t)
+	t.draggableManager.finish(t)
 
 	t.after = t.after[:0]
 }

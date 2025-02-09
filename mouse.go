@@ -23,9 +23,21 @@ type mouseInputManager struct {
 	lastUnderCursor *MouseInput
 }
 
-func (g *Timui) MouseInput(id string, area mathi.Box2) *MouseInput {
-	cid := g.id.Push(id)
-	mouseInput, has := g.mouseInputManager.lastInputs[cid]
+// MouseInputForSize creates a mouse area from given size relative to the current cursor area
+func (t *Timui) MouseInputForSize(id string, size mathi.Vec2) *MouseInput {
+	return t.MouseInputForArea(id, mathi.Box2{To: size})
+}
+
+// MouseInput creates a mouse area for the current cursor area
+func (t *Timui) MouseInput(id string) *MouseInput {
+	s := t.CurrentArea().Size()
+	return t.MouseInputForArea(id, mathi.Box2{To: s})
+}
+
+// MouseInputForArea creates a mouse area from given area relative to the current cursor area
+func (t *Timui) MouseInputForArea(id string, area mathi.Box2) *MouseInput {
+	cid := t.id.Push(id)
+	mouseInput, has := t.mouseInputManager.lastInputs[cid]
 	if !has {
 		mouseInput = &MouseInput{}
 	}
@@ -50,15 +62,15 @@ func (g *Timui) MouseInput(id string, area mathi.Box2) *MouseInput {
 		mouseInput.leftPressCount = 0
 	}
 
-	mouseInput.area = area.Translate(g.CurrentArea().From)
-	mousePos := g.backend.MousePosition()
-	if mouseInput.area.Contains(mousePos) && g.PeekClip().Contains(mousePos) {
-		g.mouseInputManager.underCursor = mouseInput
+	mouseInput.area = area.Translate(t.CurrentArea().From)
+	mousePos := t.backend.MousePosition()
+	if mouseInput.area.Contains(mousePos) && t.PeekClip().Contains(mousePos) {
+		t.mouseInputManager.underCursor = mouseInput
 	}
 
-	g.mouseInputManager.nextInputs[cid] = mouseInput
+	t.mouseInputManager.nextInputs[cid] = mouseInput
 
-	g.id.Pop()
+	t.id.Pop()
 
 	return mouseInput
 }

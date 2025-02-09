@@ -27,7 +27,7 @@ func (o OptionGroupElement[V]) Option(name string, value V) bool {
 
 	size.Y = 1
 
-	mouse := o.t.MouseInput(name, mathi.Box2{To: size})
+	mouse := o.t.MouseInputForSize(name, size)
 
 	bgCol := o.t.Theme.Widget.BG
 

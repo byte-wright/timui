@@ -50,7 +50,7 @@ func (g *Timui) Dropdown(id string, elements int, selected *int, paint func(i in
 		g.runAfter(func() {
 			g.id.PushID(cid)
 
-			modal := g.MouseInput("modal", *g.CurrentArea())
+			modal := g.MouseInput("modal")
 			if modal.LeftReleased() {
 				dd.open = false
 			}
@@ -73,7 +73,7 @@ func (g *Timui) Dropdown(id string, elements int, selected *int, paint func(i in
 				ma.To.Y = ma.From.Y + 1
 				g.PushArea(ma)
 
-				mi := g.MouseInput(strconv.Itoa(i), mathi.Box2{To: ma.Size()})
+				mi := g.MouseInputForSize(strconv.Itoa(i), ma.Size())
 
 				if mi.Hovered() > 0 || i == *selected {
 					g.HLine(dropdownSelectionStyle, g.Theme.Widget.Text, g.Theme.Widget.HoverBG)
@@ -110,7 +110,7 @@ func (d *dropdown) paintSelection(theme *Theme) {
 
 	size := mathi.Vec2{X: remWidth, Y: 1}
 
-	mouse := d.g.MouseInput("area", mathi.Box2{To: size})
+	mouse := d.g.MouseInputForSize("area", size)
 	if mouse.LeftReleased() {
 		d.open = !d.open
 	}

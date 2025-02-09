@@ -12,7 +12,7 @@ func (g *Timui) Button(name string) bool {
 
 	size.Y = 1
 
-	mouse := g.MouseInput(name, mathi.Box2{To: size})
+	mouse := g.MouseInputForSize(name, size)
 
 	bgCol := g.Theme.Widget.BG
 

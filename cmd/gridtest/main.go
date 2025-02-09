@@ -10,6 +10,7 @@ import (
 
 	"github.com/byte-wright/timui"
 	"github.com/byte-wright/timui/tcell"
+	"gitlab.com/bytewright/gmath/mathi"
 )
 
 var (
@@ -128,6 +129,7 @@ func render(tui *timui.Timui) {
 		})
 
 		cols.Next()
+		draggable(tui)
 
 		cols.Finish()
 	}
@@ -152,6 +154,24 @@ func render(tui *timui.Timui) {
 	grid.Finish()
 
 	tui.Finish()
+}
+
+var pos = mathi.Vec2{}
+
+func draggable(tui *timui.Timui) {
+	tui.Draggable("drag1", mathi.Box2{To: mathi.Vec2{X: 20, Y: 7}}, mathi.Vec2{X: 4, Y: 2}, &pos)
+
+	cursor := tui.CurrentArea().From
+
+	area := mathi.Box2{From: cursor.Add(pos), To: cursor.Add(pos).Add(mathi.Vec2{X: 4, Y: 2})}
+	tui.PushArea(area)
+	tui.HLine([3]rune{'/', '*', '\\'}, timui.MustRGBS("#ff0"), timui.MustRGBS("#550"))
+	tui.PopArea()
+
+	area.From.Y++
+	tui.PushArea(area)
+	tui.HLine([3]rune{'\\', '*', '/'}, timui.MustRGBS("#ff0"), timui.MustRGBS("#550"))
+	tui.PopArea()
 }
 
 func leftSingleGrid(tui *timui.Timui) {
