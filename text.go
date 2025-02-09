@@ -1,6 +1,8 @@
 package timui
 
 import (
+	"strings"
+
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
@@ -15,13 +17,39 @@ func (t *Timui) Text(name string, pos mathi.Vec2, fg, bg RGBAColor) {
 func (t *Timui) Label(name string) {
 	w := t.CurrentArea().Size().X
 
-	if len(name) > w+1 {
-		ne := w - 2
-		if ne > 0 {
-			name = name[:ne] + "..."
-		}
+	t.Text(cutText(name, w), mathi.Vec2{}, Transparent, Transparent)
+	t.moveCursor(mathi.Vec2{Y: 1})
+}
+
+func cutText(text string, width int) string {
+	runes := []rune(text)
+
+	if len(runes) <= width {
+		return text
 	}
 
-	t.Text(name, mathi.Vec2{}, Transparent, Transparent)
-	t.moveCursor(mathi.Vec2{Y: 1})
+	if width <= 3 {
+		return string(runes[:width])
+	}
+
+	return string(runes[:width-3]) + "..."
+}
+
+func cutTextAndPad(text string, width int) string {
+	runes := []rune(text)
+
+	if len(runes) == width {
+		return text
+	}
+
+	if len(runes) <= width {
+		pad := width - len(runes)
+		return text + strings.Repeat(" ", pad)
+	}
+
+	if width <= 3 {
+		return string(runes[:width])
+	}
+
+	return string(runes[:width-3]) + "..."
 }

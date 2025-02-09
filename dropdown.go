@@ -87,7 +87,7 @@ func (g *Timui) Dropdown(id string, elements int, selected *int, paint func(i in
 				g.PopArea()
 
 				ma.From.X += 1
-				ma.To.X -= 2
+				ma.To.X -= 1
 
 				g.PushArea(ma)
 				dd.paint(i, dd.selected == i)
@@ -136,7 +136,7 @@ func (d *dropdown) paintSelection(theme *Theme) {
 	a := *d.g.CurrentArea()
 	a.To.Y = a.From.Y
 	a.From.X += 2
-	a.To.X -= 6
+	a.To.X -= 5
 	d.g.PushArea(a)
 	d.g.SetArea(0, theme.Widget.Text, bgCol)
 	d.paint(d.selected, false)

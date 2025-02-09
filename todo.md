@@ -2,9 +2,13 @@
 - transparent colors [OK]
 - dropdown [OK]
 - row/column fixed widths [OK]
-- modal dialog
-- drag and drop
+- modal dialog [OK]
+- drag and drop [OK]
 - scrollbars
-- menu
 - split area resize
-- widget style stacks
+- widget style stacks?
+
+# 2
+- tab navigation/focus/input tree
+- keyboard navigation
+- shortcuts

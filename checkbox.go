@@ -1,8 +1,6 @@
 package timui
 
 import (
-	"strings"
-
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
@@ -31,9 +29,11 @@ func (g *Timui) Checkbox(name string, checked *bool) bool {
 		g.Text("[ ] ", mathi.Vec2{}, g.Theme.Widget.Line.RGBA(0xff), bgColA)
 	}
 
-	pad := size.X - len(name) - 4
+	available := size.X - 4
 
-	g.Text(name+strings.Repeat(" ", pad), mathi.Vec2{X: 4}, g.Theme.Widget.Text.RGBA(0xff), bgColA)
+	name = cutTextAndPad(name, available)
+
+	g.Text(name, mathi.Vec2{X: 4}, g.Theme.Widget.Text.RGBA(0xff), bgColA)
 
 	g.moveCursor(mathi.Vec2{Y: 1})
 

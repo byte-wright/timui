@@ -1,8 +1,6 @@
 package timui
 
 import (
-	"strings"
-
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
@@ -47,9 +45,10 @@ func (o OptionGroupElement[V]) Option(name string, value V) bool {
 		o.t.Text("( ) ", mathi.Vec2{}, o.t.Theme.Widget.Line.RGBA(0xff), bgColA)
 	}
 
-	pad := size.X - len(name) - 4
+	available := size.X - 4
+	name = cutTextAndPad(name, available)
 
-	o.t.Text(name+strings.Repeat(" ", pad), mathi.Vec2{X: 4}, o.t.Theme.Widget.Text.RGBA(0xff), bgColA)
+	o.t.Text(name, mathi.Vec2{X: 4}, o.t.Theme.Widget.Text.RGBA(0xff), bgColA)
 
 	o.t.moveCursor(mathi.Vec2{Y: 1})
 

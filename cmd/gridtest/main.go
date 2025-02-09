@@ -78,7 +78,6 @@ func main() {
 		time.Sleep(time.Millisecond * 33)
 
 		render(tui)
-
 	}
 }
 

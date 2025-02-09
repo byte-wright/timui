@@ -88,58 +88,62 @@ func (t *Timui) SetAreaAlpha(char rune, fg, bg RGBAColor) {
 }
 
 func (t *Timui) SetBorder(pos mathi.Vec2, char rune, fg, bg RGBColor) {
-	clip := t.PeekClip()
-	if clip.Contains(pos) {
+	if t.ClipContains(pos) {
 		current := t.front.Get(pos).Char
 
-		switch char {
-		case '═':
-			switch current {
-			case '╩':
-				char = '╩'
-			}
-		case '║':
-			switch current {
-			case '╣':
-				char = '╣'
-			case '┤':
-				char = '╢'
-			}
-		case '├':
-			switch current {
-			case '║':
-				char = '╟'
-			}
-		case '╠':
-			switch current {
-			case '│':
-				char = '╞'
-			}
-		case '╣':
-			switch current {
-			case '│':
-				char = '╡'
-			}
-		case '╦':
-			switch current {
-			case '╩':
-				char = '╬'
-			case '─':
-				char = '╥'
-			}
-		case '╩':
-			switch current {
-			case '─':
-				char = '╨'
-			}
-		case '-':
-			switch current {
-			case '+':
-				char = '+'
-			}
-
-		}
+		char = mapBorderRune(char, current)
 
 		t.front.Set(pos, char, uint32(fg.RGBA(0xff)), uint32(bg.RGBA(0xff)))
 	}
+}
+
+func mapBorderRune(char rune, current rune) rune {
+	switch char {
+	case '═':
+		switch current {
+		case '╩':
+			char = '╩'
+		}
+	case '║':
+		switch current {
+		case '╣':
+			char = '╣'
+		case '┤':
+			char = '╢'
+		}
+	case '├':
+		switch current {
+		case '║':
+			char = '╟'
+		}
+	case '╠':
+		switch current {
+		case '│':
+			char = '╞'
+		}
+	case '╣':
+		switch current {
+		case '│':
+			char = '╡'
+		}
+	case '╦':
+		switch current {
+		case '╩':
+			char = '╬'
+		case '─':
+			char = '╥'
+		}
+	case '╩':
+		switch current {
+		case '─':
+			char = '╨'
+		}
+	case '-':
+		switch current {
+		case '+':
+			char = '+'
+		}
+
+	}
+	return char
 }
