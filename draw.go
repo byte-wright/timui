@@ -1,6 +1,8 @@
 package timui
 
-import "gitlab.com/bytewright/gmath/mathi"
+import (
+	"gitlab.com/bytewright/gmath/mathi"
+)
 
 func (t *Timui) Border(style [6]rune, fg, bg RGBColor) {
 	c := t.CurrentArea()
@@ -59,7 +61,6 @@ func (t *Timui) Set(pos mathi.Vec2, char rune, fg, bg RGBColor) {
 
 func (t *Timui) SetArea(char rune, fg, bg RGBColor) {
 	clip := t.PeekClip()
-
 	area := t.CurrentArea()
 
 	for y := area.From.Y; y < area.To.Y; y++ {

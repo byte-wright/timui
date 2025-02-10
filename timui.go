@@ -19,6 +19,7 @@ type Timui struct {
 	mouseInputManager mouseInputManager
 	dropdownManager   dropdownManager
 	draggableManager  draggableManager
+	scrollAreaManager scrollAreaManager
 
 	Theme Theme
 }
@@ -55,6 +56,7 @@ func New(backend Backend) *Timui {
 		mouseInputManager: *newMouseInputManager(),
 		dropdownManager:   *newDropdownManager(),
 		draggableManager:  *newDraggableManager(),
+		scrollAreaManager: *newScrollAreaManager(),
 
 		Theme: DefaultTheme,
 	}
@@ -103,6 +105,7 @@ func (t *Timui) finish() {
 	t.mouseInputManager.finish(t)
 	t.dropdownManager.finish(t)
 	t.draggableManager.finish(t)
+	t.scrollAreaManager.finish()
 
 	t.after = t.after[:0]
 }
@@ -113,6 +116,11 @@ func (t *Timui) CurrentArea() *mathi.Box2 {
 
 func (t *Timui) PushArea(area mathi.Box2) {
 	t.area = append(t.area, area)
+}
+
+func (t *Timui) PushAreaTranslation(dir mathi.Vec2) {
+	translated := t.CurrentArea().Translate(dir)
+	t.PushArea(translated)
 }
 
 func (t *Timui) PopArea() {

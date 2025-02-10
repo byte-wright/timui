@@ -91,7 +91,7 @@ func render(tui *timui.Timui) {
 	rows.Next()
 
 	{
-		cols := rows.Columns(timui.Split().Fixed(12).Factor(0.3, 0.4, 0.5, 0.6, 1))
+		cols := rows.Columns(timui.Split().Fixed(12).Factor(0.3, 0.4, 0.5, 0.6, 0.5, 0.5))
 		countButtons(tui)
 
 		cols.Next()
@@ -130,6 +130,9 @@ func render(tui *timui.Timui) {
 		cols.Next()
 		draggable(tui)
 
+		cols.Next()
+		scrollable(tui)
+
 		cols.Finish()
 	}
 
@@ -156,6 +159,16 @@ func render(tui *timui.Timui) {
 }
 
 var pos = mathi.Vec2{}
+
+func scrollable(tui *timui.Timui) {
+	scr := tui.ScrollAreaV("scroll")
+
+	for i := 0; i < 15; i++ {
+		tui.Label(fmt.Sprintf("Line nr %v", i))
+	}
+
+	scr.Finish()
+}
 
 func draggable(tui *timui.Timui) {
 	tui.Draggable("drag1", mathi.Box2{To: mathi.Vec2{X: 20, Y: 7}}, mathi.Vec2{X: 4, Y: 2}, &pos)

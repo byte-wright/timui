@@ -10,7 +10,8 @@ func (t *Timui) Text(name string, pos mathi.Vec2, fg, bg RGBAColor) {
 	p := t.CurrentArea().From.Add(pos)
 
 	for i, r := range []rune(name) {
-		t.front.Set(p.Add(mathi.Vec2{X: i}), r, uint32(fg), uint32(bg))
+		pos := p.Add(mathi.Vec2{X: i})
+		t.SetAlpha(pos, r, fg, bg)
 	}
 }
 
