@@ -1,5 +1,9 @@
 package timui
 
+import (
+	"math"
+)
+
 type SplitOptions struct {
 	splits  []split
 	padding int
@@ -77,7 +81,7 @@ func (so *SplitOptions) calculatePositions(width int) []splitRange {
 
 		w := 0
 		if remaining > 0 {
-			w = int(float32(remaining) * f.factor / totalFactor)
+			w = int(math.Round(float64(float32(remaining) * f.factor / totalFactor)))
 		}
 
 		pos += w

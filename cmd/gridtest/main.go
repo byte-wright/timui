@@ -281,5 +281,6 @@ func header(tui *timui.Timui) {
 }
 
 func footer(tui *timui.Timui) {
-	tui.Label("I'm the Foooter!")
+	s := tui.Size()
+	tui.Label(fmt.Sprintf("I'm the Foooter! %v/%v", s.X, s.Y))
 }

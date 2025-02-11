@@ -145,14 +145,16 @@ func (g *GridRows) Columns(pos *SplitOptions) *GridColumns {
 		panic("grid columns padding must be zero")
 	}
 
+	completeArea := g.currentCompleteArea()
+
 	pos.insertFixedBetween(1)
 
-	positions := pos.calculatePositions(g.area.Size().X)
+	positions := pos.calculatePositions(completeArea.Size().X)
 
 	gridColumns := &GridColumns{
 		t:         g.t,
 		positions: positions,
-		area:      g.currentCompleteArea(),
+		area:      completeArea,
 		column:    1,
 	}
 
@@ -172,14 +174,16 @@ func (g *GridRows) Rows(pos *SplitOptions) *GridRows {
 		panic("grid columns padding must be zero")
 	}
 
+	completeArea := g.currentCompleteArea()
+
 	pos.insertFixedBetween(1)
 
-	positions := pos.calculatePositions(g.currentCompleteArea().Size().Y)
+	positions := pos.calculatePositions(completeArea.Size().Y)
 
 	gridRows := &GridRows{
 		t:         g.t,
 		positions: positions,
-		area:      g.currentCompleteArea(),
+		area:      completeArea,
 		row:       1,
 	}
 
@@ -198,16 +202,14 @@ func (g *GridColumns) Next() {
 	g.t.PopArea()
 	g.column += 1
 
-	area := g.currentArea()
-
-	g.t.PushArea(area)
+	g.t.PushArea(g.currentArea())
 
 	g.t.VLine(g.t.Theme.BorderStyle.Vertical, g.t.Theme.BorderLine, g.t.Theme.BorderBG)
 	g.t.PopArea()
 
 	g.column += 1
 
-	area = g.currentArea()
+	area := g.currentArea()
 	pad := mathi.Vec2{Y: 1}
 	area.From = area.From.Add(pad)
 	area.To = area.To.Sub(pad)
@@ -220,14 +222,16 @@ func (g *GridColumns) Rows(pos *SplitOptions) *GridRows {
 		panic("grid rows padding must be zero")
 	}
 
+	completeArea := g.currentCompleteArea()
+
 	pos.insertFixedBetween(1)
 
-	positions := pos.calculatePositions(g.area.Size().Y)
+	positions := pos.calculatePositions(completeArea.Size().Y)
 
 	gridRows := &GridRows{
 		t:         g.t,
 		positions: positions,
-		area:      g.currentCompleteArea(),
+		area:      completeArea,
 		row:       1,
 	}
 
@@ -248,13 +252,13 @@ func (g *GridColumns) Columns(pos *SplitOptions) *GridColumns {
 	}
 
 	pos.insertFixedBetween(1)
-
-	positions := pos.calculatePositions(g.area.Size().X)
+	completeArea := g.currentCompleteArea()
+	positions := pos.calculatePositions(completeArea.Size().X)
 
 	gridColumns := &GridColumns{
 		t:         g.t,
 		positions: positions,
-		area:      g.currentCompleteArea(),
+		area:      completeArea,
 		column:    1,
 	}
 

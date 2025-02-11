@@ -131,6 +131,10 @@ func (t *Timui) GetMousePosition() mathi.Vec2 {
 	return t.backend.MousePosition()
 }
 
+func (t *Timui) Size() mathi.Vec2 {
+	return t.backend.Size()
+}
+
 func (t *Timui) moveCursor(delta mathi.Vec2) {
 	t.CurrentArea().From = t.CurrentArea().From.Add(delta)
 }
