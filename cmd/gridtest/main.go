@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	count    = 0
+	count    = 15
 	selected int
 	checkedA bool
 	checkedB bool
@@ -161,13 +161,11 @@ func render(tui *timui.Timui) {
 var pos = mathi.Vec2{}
 
 func scrollable(tui *timui.Timui) {
-	scr := tui.ScrollAreaV("scroll")
-
-	for i := 0; i < 15; i++ {
-		tui.Label(fmt.Sprintf("Line nr %v", i))
-	}
-
-	scr.Finish()
+	tui.ScrollAreaV("scroll", func() {
+		for i := 0; i < count; i++ {
+			tui.Label(fmt.Sprintf("Line nr %v", i))
+		}
+	})
 }
 
 func draggable(tui *timui.Timui) {

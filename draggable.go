@@ -1,8 +1,6 @@
 package timui
 
 import (
-	"fmt"
-
 	"github.com/byte-wright/timui/internal"
 	"gitlab.com/bytewright/gmath/mathi"
 )
@@ -30,15 +28,14 @@ func (t *Timui) Draggable(id string, area mathi.Box2, size mathi.Vec2, pos *math
 
 	cursor := t.CurrentArea().From
 
-	mouse := t.MouseInputForArea(id, mathi.NewBox2FromSize((*pos), size))
+	mouse := t.MouseInputForArea(id, mathi.NewBox2FromSize((area.From.Add(*pos)), size))
 
 	dragStart := false
 
 	if mouse.LeftPressed() > 0 && t.draggableManager.dragging == nil {
-		fmt.Println("Start drag")
 		t.draggableManager.dragging = draggable
 
-		t.draggableManager.startPos = (*pos).Add(cursor)
+		t.draggableManager.startPos = cursor.Add(area.From).Add(*pos)
 		t.draggableManager.mouseStartPos = t.backend.MousePosition()
 
 		dragStart = true
