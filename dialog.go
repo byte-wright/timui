@@ -27,38 +27,31 @@ func (t *Timui) Dialog(title string, visible *bool, content func()) {
 
 			t.MouseInput("dialog") // to cancel the modal backdrop close click
 
-			grid := t.Grid()
+			t.Grid(func(grid *Grid) {
+				t.SetArea(' ', t.Theme.Text, t.Theme.BG)
 
-			t.SetArea(' ', t.Theme.Text, t.Theme.BG)
+				grid.Rows(Split().Fixed(1).Factor(1), func(rows *GridRows) {
+					rows.Columns(Split().Factor(1).Fixed(3), func(title *GridColumns) {
+						t.Pad(0, 1, 0, 1, func() {
+							t.Label("title")
+						})
 
-			rows := grid.Rows(Split().Fixed(1).Factor(1))
+						title.Next()
 
-			title := rows.Columns(Split().Factor(1).Fixed(3))
+						close := t.MouseInputForSize("close", mathi.Vec2{X: 3, Y: 1})
+						if close.LeftReleased() {
+							*visible = false
+						}
+						if close.Hovered() > 0 {
+							t.SetAreaAlpha(0, Transparent, RGBA(0x55, 0, 0, 0xff))
+						}
+						t.Label(" X ")
+					})
 
-			tp := t.Pad(0, 1, 0, 1)
-			t.Label("title")
-			tp.Finish()
-
-			title.Next()
-
-			close := t.MouseInputForSize("close", mathi.Vec2{X: 3, Y: 1})
-			if close.LeftReleased() {
-				*visible = false
-			}
-			if close.Hovered() > 0 {
-				t.SetAreaAlpha(0, Transparent, RGBA(0x55, 0, 0, 0xff))
-			}
-			t.Label(" X ")
-			title.Finish()
-
-			rows.Next()
-			cp := t.Pad(0, 1, 0, 1)
-			content()
-			cp.Finish()
-
-			rows.Finish()
-
-			grid.Finish()
+					rows.Next()
+					t.Pad(0, 1, 0, 1, content)
+				})
+			})
 
 			t.PopArea()
 

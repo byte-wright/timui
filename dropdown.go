@@ -62,43 +62,42 @@ func (g *Timui) Dropdown(id string, elements int, selected *int, paint func(i in
 
 			g.Border(dropdownBordeStyleLine, g.Theme.Widget.Line, g.Theme.Widget.BG)
 
-			pad := g.Pad(1, 1, 1, 1)
-			g.SetArea(' ', g.Theme.Widget.Text, g.Theme.Widget.BG)
+			g.Pad(1, 1, 1, 1, func() {
+				g.SetArea(' ', g.Theme.Widget.Text, g.Theme.Widget.BG)
 
-			g.id.Push("selection")
+				g.id.Push("selection")
 
-			for i := 0; i < dd.elements; i++ {
-				ma := *g.CurrentArea()
+				for i := 0; i < dd.elements; i++ {
+					ma := *g.CurrentArea()
 
-				ma.To.Y = ma.From.Y + 1
-				g.PushArea(ma)
+					ma.To.Y = ma.From.Y + 1
+					g.PushArea(ma)
 
-				mi := g.MouseInputForSize(strconv.Itoa(i), ma.Size())
+					mi := g.MouseInputForSize(strconv.Itoa(i), ma.Size())
 
-				if mi.Hovered() > 0 || i == *selected {
-					g.HLine(dropdownSelectionStyle, g.Theme.Widget.Text, g.Theme.Widget.HoverBG)
+					if mi.Hovered() > 0 || i == *selected {
+						g.HLine(dropdownSelectionStyle, g.Theme.Widget.Text, g.Theme.Widget.HoverBG)
+					}
+
+					if mi.LeftReleased() {
+						*selected = i
+						dd.open = false
+					}
+
+					g.PopArea()
+
+					ma.From.X += 1
+					ma.To.X -= 1
+
+					g.PushArea(ma)
+					dd.paint(i, dd.selected == i)
+					g.PopArea()
+
+					g.moveCursor(mathi.Vec2{Y: 1})
 				}
 
-				if mi.LeftReleased() {
-					*selected = i
-					dd.open = false
-				}
-
-				g.PopArea()
-
-				ma.From.X += 1
-				ma.To.X -= 1
-
-				g.PushArea(ma)
-				dd.paint(i, dd.selected == i)
-				g.PopArea()
-
-				g.moveCursor(mathi.Vec2{Y: 1})
-			}
-
-			g.id.Pop()
-
-			pad.Finish()
+				g.id.Pop()
+			})
 			g.PopArea()
 			g.id.Pop()
 		})

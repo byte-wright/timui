@@ -9,7 +9,7 @@ type Grid struct {
 	area mathi.Box2
 }
 
-func (t *Timui) Grid() *Grid {
+func (t *Timui) Grid(body func(grid *Grid)) {
 	t.Border(t.Theme.BorderStyle.Rect, t.Theme.BorderLine, t.Theme.BorderBG)
 
 	area := *t.CurrentArea()
@@ -21,13 +21,17 @@ func (t *Timui) Grid() *Grid {
 
 	t.PushArea(area)
 
-	return &Grid{
+	grid := &Grid{
 		t:    t,
 		area: originalArea,
 	}
+
+	body(grid)
+
+	grid.finish()
 }
 
-func (g *Grid) Finish() {
+func (g *Grid) finish() {
 	g.t.PopArea()
 }
 
@@ -38,7 +42,7 @@ type GridRows struct {
 	row       int
 }
 
-func (g *Grid) Rows(pos *SplitOptions) *GridRows {
+func (g *Grid) Rows(pos *SplitOptions, body func(rows *GridRows)) {
 	if pos.padding != 0 {
 		panic("grid rows padding must be zero")
 	}
@@ -62,10 +66,12 @@ func (g *Grid) Rows(pos *SplitOptions) *GridRows {
 
 	g.t.PushArea(area)
 
-	return gridRows
+	body(gridRows)
+
+	gridRows.finish()
 }
 
-func (g *Grid) Columns(pos *SplitOptions) *GridColumns {
+func (g *Grid) Columns(pos *SplitOptions, body func(rows *GridColumns)) {
 	if pos.padding != 0 {
 		panic("grid rows padding must be zero")
 	}
@@ -89,7 +95,9 @@ func (g *Grid) Columns(pos *SplitOptions) *GridColumns {
 
 	g.t.PushArea(area)
 
-	return gridRows
+	body(gridRows)
+
+	gridRows.finish()
 }
 
 func (g *GridRows) Next() {
@@ -129,7 +137,7 @@ func (g *GridRows) currentCompleteArea() mathi.Box2 {
 	return area
 }
 
-func (g *GridRows) Finish() {
+func (g *GridRows) finish() {
 	g.t.PopArea()
 }
 
@@ -140,7 +148,7 @@ type GridColumns struct {
 	column    int
 }
 
-func (g *GridRows) Columns(pos *SplitOptions) *GridColumns {
+func (g *GridRows) Columns(pos *SplitOptions, body func(columns *GridColumns)) {
 	if pos.padding != 0 {
 		panic("grid columns padding must be zero")
 	}
@@ -166,10 +174,12 @@ func (g *GridRows) Columns(pos *SplitOptions) *GridColumns {
 
 	g.t.PushArea(area)
 
-	return gridColumns
+	body(gridColumns)
+
+	gridColumns.finish()
 }
 
-func (g *GridRows) Rows(pos *SplitOptions) *GridRows {
+func (g *GridRows) Rows(pos *SplitOptions, body func(rows *GridRows)) {
 	if pos.padding != 0 {
 		panic("grid columns padding must be zero")
 	}
@@ -195,7 +205,9 @@ func (g *GridRows) Rows(pos *SplitOptions) *GridRows {
 
 	g.t.PushArea(area)
 
-	return gridRows
+	body(gridRows)
+
+	gridRows.finish()
 }
 
 func (g *GridColumns) Next() {
@@ -217,7 +229,7 @@ func (g *GridColumns) Next() {
 	g.t.PushArea(area)
 }
 
-func (g *GridColumns) Rows(pos *SplitOptions) *GridRows {
+func (g *GridColumns) Rows(pos *SplitOptions, body func(rows *GridRows)) {
 	if pos.padding != 0 {
 		panic("grid rows padding must be zero")
 	}
@@ -243,10 +255,12 @@ func (g *GridColumns) Rows(pos *SplitOptions) *GridRows {
 
 	g.t.PushArea(area)
 
-	return gridRows
+	body(gridRows)
+
+	gridRows.finish()
 }
 
-func (g *GridColumns) Columns(pos *SplitOptions) *GridColumns {
+func (g *GridColumns) Columns(pos *SplitOptions, body func(columns *GridColumns)) {
 	if pos.padding != 0 {
 		panic("grid rows padding must be zero")
 	}
@@ -270,7 +284,9 @@ func (g *GridColumns) Columns(pos *SplitOptions) *GridColumns {
 
 	g.t.PushArea(area)
 
-	return gridColumns
+	body(gridColumns)
+
+	gridColumns.finish()
 }
 
 func (g *GridColumns) currentArea() mathi.Box2 {
@@ -289,6 +305,6 @@ func (g *GridColumns) currentCompleteArea() mathi.Box2 {
 	return area
 }
 
-func (g *GridColumns) Finish() {
+func (g *GridColumns) finish() {
 	g.t.PopArea()
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/byte-wright/timui"
 	"github.com/byte-wright/timui/tcell"
+	"github.com/byte-wright/timui/util"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
@@ -22,30 +23,11 @@ var (
 )
 
 func main() {
-	// Open files for stdout and stderr redirection
-	stdoutFile, err := os.OpenFile("stdout.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	revert, err := util.RedirectStdToFiles()
 	if err != nil {
-		log.Fatalf("Failed to open stdout log file: %v", err)
+		log.Fatal(err)
 	}
-	defaultStdout := os.Stdout
-	defer func() {
-		stdoutFile.Close()
-		os.Stdout = defaultStdout
-	}()
-
-	stderrFile, err := os.OpenFile("stderr.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
-	if err != nil {
-		log.Fatalf("Failed to open stderr log file: %v", err)
-	}
-	defaultStderr := os.Stderr
-	defer func() {
-		stderrFile.Close()
-		os.Stderr = defaultStderr
-	}()
-
-	// Redirect stdout and stderr
-	os.Stdout = stdoutFile
-	os.Stderr = stderrFile
+	defer revert()
 
 	backend, err := tcell.NewBackend()
 	if err != nil {
@@ -82,78 +64,67 @@ func main() {
 }
 
 func render(tui *timui.Timui) {
-	grid := tui.Grid()
+	tui.Grid(func(grid *timui.Grid) {
+		grid.Rows(timui.Split().Fixed(1, 7).Factor(1).Fixed(1), func(rows *timui.GridRows) {
+			header(tui)
 
-	rows := grid.Rows(timui.Split().Fixed(1, 7).Factor(1).Fixed(1))
+			rows.Next()
 
-	header(tui)
+			rows.Columns(timui.Split().Fixed(12).Factor(0.3, 0.4, 0.5, 0.6, 0.5, 0.5), func(cols *timui.GridColumns) {
+				countButtons(tui)
 
-	rows.Next()
+				cols.Next()
 
-	{
-		cols := rows.Columns(timui.Split().Fixed(12).Factor(0.3, 0.4, 0.5, 0.6, 0.5, 0.5))
-		countButtons(tui)
+				tui.Theme.WithBorder(timui.BorderSingle, func() {
+					cols.Rows(timui.Split().Fixed(1).Factor(1).Fixed(1), func(subRows *timui.GridRows) {
+						tui.Dropdown("sel1", 10, &selected, func(i int, s bool) {
+							tui.Label(fmt.Sprintf("Item %v is my friend", i))
+						})
 
-		cols.Next()
+						subRows.Next()
 
-		tui.Theme.WithBorder(timui.BorderSingle, func() {
-			subRows := cols.Rows(timui.Split().Fixed(1).Factor(1).Fixed(1))
-			tui.Dropdown("sel1", 10, &selected, func(i int, s bool) {
-				tui.Label(fmt.Sprintf("Item %v is my friend", i))
+						tui.Label("Select the thing")
+
+						subRows.Next()
+						tui.Label(fmt.Sprintf("sel is %v", selected))
+					})
+				})
+
+				cols.Next()
+				checkboxes(tui)
+
+				cols.Next()
+				options(tui)
+				cols.Next()
+
+				if tui.Button("Dialog...") {
+					dialogA = true
+				}
+
+				tui.Dialog("Main DIalog!", &dialogA, func() {
+					tui.Label("Fishfingers!")
+				})
+
+				cols.Next()
+				draggable(tui)
+
+				cols.Next()
+				scrollable(tui)
 			})
 
-			subRows.Next()
+			rows.Next()
 
-			tui.Label("Select the thing")
+			rows.Columns(timui.Split().Factor(1, 1), func(subCols *timui.GridColumns) {
+				leftSingleGrid(tui)
 
-			subRows.Next()
-			tui.Label(fmt.Sprintf("sel is %v", selected))
+				subCols.Next()
+				rightSingleGrid(tui)
+			})
 
-			subRows.Finish()
+			rows.Next()
+			footer(tui)
 		})
-
-		cols.Next()
-		checkboxes(tui)
-
-		cols.Next()
-		options(tui)
-		cols.Next()
-
-		if tui.Button("Dialog...") {
-			dialogA = true
-		}
-
-		tui.Dialog("Main DIalog!", &dialogA, func() {
-			tui.Label("Fishfingers!")
-		})
-
-		cols.Next()
-		draggable(tui)
-
-		cols.Next()
-		scrollable(tui)
-
-		cols.Finish()
-	}
-
-	rows.Next()
-
-	{
-		subCols := rows.Columns(timui.Split().Factor(1, 1))
-		leftSingleGrid(tui)
-
-		subCols.Next()
-		rightSingleGrid(tui)
-
-		subCols.Finish()
-	}
-
-	rows.Next()
-	footer(tui)
-
-	rows.Finish()
-
-	grid.Finish()
+	})
 
 	tui.Finish()
 }
@@ -186,64 +157,54 @@ func draggable(tui *timui.Timui) {
 
 func leftSingleGrid(tui *timui.Timui) {
 	tui.Theme.WithBorder(timui.BorderRoundSingle, func() {
-		pad := tui.Pad(0, 1, 0, 1)
-		grid := tui.Grid()
+		tui.Pad(0, 1, 0, 1, func() {
+			tui.Grid(func(grid *timui.Grid) {
+				tui.Theme.WithBorder(timui.BorderDouble, func() {
+					grid.Rows(timui.Split().Factor(1, 1), func(rows *timui.GridRows) {
+						tui.Theme.WithBorder(timui.BorderSingle, func() {
+							rows.Rows(timui.Split().Fixed(1).Factor(1), func(rows *timui.GridRows) {
+								tui.Label("Title")
 
-		tui.Theme.WithBorder(timui.BorderDouble, func() {
-			rows := grid.Rows(timui.Split().Factor(1, 1))
+								rows.Next()
+								tui.Label("Content...")
+								tui.Label("Content...")
+								tui.Label("Content...")
+							})
+						})
 
-			tui.Theme.WithBorder(timui.BorderSingle, func() {
-				subRows := rows.Rows(timui.Split().Fixed(1).Factor(1))
-				tui.Label("Title")
-
-				subRows.Next()
-				tui.Label("Content...")
-				tui.Label("Content...")
-				tui.Label("Content...")
-
-				subRows.Finish()
+						rows.Next()
+						tui.Label("BOTTOM")
+					})
+				})
 			})
-
-			rows.Next()
-			tui.Label("BOTTOM")
-
-			rows.Finish()
 		})
-
-		grid.Finish()
-		pad.Finish()
 	})
 }
 
 func rightSingleGrid(tui *timui.Timui) {
 	tui.Theme.WithBorder(timui.BorderSingle, func() {
-		pad := tui.Pad(0, 1, 0, 1)
-		grid := tui.Grid()
+		tui.Pad(0, 1, 0, 1, func() {
+			tui.Grid(func(grid *timui.Grid) {
+				tui.Theme.WithBorder(timui.BorderDouble, func() {
+					grid.Columns(timui.Split().Factor(1, 1), func(rows *timui.GridColumns) {
+						tui.Theme.WithBorder(timui.BorderSingle, func() {
+							rows.Columns(timui.Split().Fixed(1).Factor(1), func(columns *timui.GridColumns) {
+								tui.Label("A")
+								tui.Label("B")
+								tui.Label("C")
 
-		tui.Theme.WithBorder(timui.BorderDouble, func() {
-			rows := grid.Columns(timui.Split().Factor(1, 1))
+								columns.Next()
+								tui.Label("Content...")
+								tui.Label("Content...")
+								tui.Label("Content...")
+							})
+						})
 
-			tui.Theme.WithBorder(timui.BorderSingle, func() {
-				subRows := rows.Columns(timui.Split().Fixed(1).Factor(1))
-				tui.Label("A")
-				tui.Label("B")
-				tui.Label("C")
-
-				subRows.Next()
-				tui.Label("Content...")
-				tui.Label("Content...")
-				tui.Label("Content...")
-
-				subRows.Finish()
+						rows.Next()
+					})
+				})
 			})
-
-			rows.Next()
-
-			rows.Finish()
 		})
-
-		grid.Finish()
-		pad.Finish()
 	})
 }
 

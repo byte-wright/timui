@@ -24,9 +24,10 @@ func (n *nopBackend) Set(pos mathi.Vec2, char rune, fg uint32, bg uint32) {
 }
 
 func (n *nopBackend) Size() mathi.Vec2 {
-	return mathi.Vec2{X: 120, Y: 60}
+	return mathi.Vec2{X: 180, Y: 60}
 }
 
+// 41521 ns/op
 func BenchmarkRenderLoop(b *testing.B) {
 	tui := timui.New(&nopBackend{})
 
