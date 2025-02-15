@@ -4,7 +4,8 @@
 - row/column fixed widths [OK]
 - modal dialog [OK]
 - drag and drop [OK]
-- scrollbars
+- scrollbars [OK]
+- textinputfield
 - split area resize
 - widget style stacks?
 
