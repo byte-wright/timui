@@ -30,7 +30,7 @@ are rendered using function calls like:
 Backends
 --------
 
-The manipulationg of the terminal and event handling is done via backends.
+The manipulating of the terminal and event handling is done via backends.
 
 Currently there is a github.com/gdamore/tcell backend.
 
