@@ -3,7 +3,7 @@ package timui
 import (
 	"testing"
 
-	"github.com/akabio/expect"
+	"github.com/byte-wright/expect"
 )
 
 func TestRGBColors(t *testing.T) {

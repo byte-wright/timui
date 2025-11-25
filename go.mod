@@ -3,7 +3,7 @@ module github.com/byte-wright/timui
 go 1.23.3
 
 require (
-	github.com/akabio/expect v0.10.0
+	github.com/byte-wright/expect v0.13.0
 	github.com/gdamore/tcell/v2 v2.7.4
 	gitlab.com/bytewright/gmath v0.22.0
 )
@@ -16,6 +16,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
+	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b // indirect
 	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/term v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
