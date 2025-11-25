@@ -1,32 +1,81 @@
 package util
 
 import (
+	"log"
 	"os"
+	"runtime/debug"
 )
 
+type RestoreSTD struct {
+	defaultStdout *os.File
+	defaultStderr *os.File
+	fileStdout    *os.File
+	fileStderr    *os.File
+
+	callbacks []func()
+}
+
 // RedirectStdToFiles replaces stdout and stderr with file writers.
-// The returned func reverts replacement of stdout and err.
-func RedirectStdToFiles() (func(), error) {
+// The returned struct has functions to revert replacement of stdout and err with fs files.
+func RedirectStdToFiles() (*RestoreSTD, error) {
+	restore := &RestoreSTD{
+		defaultStdout: os.Stdout,
+		defaultStderr: os.Stderr,
+	}
+
+	var err error
+
 	// Open files for stdout and stderr redirection
-	stdoutFile, err := os.OpenFile("stdout.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	restore.fileStdout, err = os.OpenFile("stdout.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		return nil, err
 	}
-	defaultStdout := os.Stdout
-	os.Stdout = stdoutFile
+	os.Stdout = restore.fileStdout
 
-	stderrFile, err := os.OpenFile("stderr.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	restore.fileStderr, err = os.OpenFile("stderr.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		return nil, err
 	}
-	defaultStderr := os.Stderr
-	os.Stderr = stderrFile
+	os.Stderr = restore.fileStderr
 
-	return func() {
-		os.Stdout = defaultStdout
-		stdoutFile.Close()
+	log.Default().SetOutput(os.Stdout)
 
-		os.Stderr = defaultStderr
-		stderrFile.Close()
-	}, nil
+	err = debug.SetCrashOutput(restore.fileStderr, debug.CrashOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return restore, nil
+}
+
+func (r *RestoreSTD) Restore() {
+	os.Stdout = r.defaultStdout
+	r.fileStdout.Close()
+
+	os.Stderr = r.defaultStderr
+	r.fileStderr.Close()
+
+	log.Default().SetOutput(os.Stdout)
+
+	for _, cb := range r.callbacks {
+		cb()
+	}
+}
+
+func (r *RestoreSTD) Run(f func()) {
+	go func() {
+		defer func() {
+			p := recover()
+			if p != nil {
+				r.Restore()
+				panic(p)
+			}
+		}()
+
+		f()
+	}()
+}
+
+func (r *RestoreSTD) AddCallback(f func()) {
+	r.callbacks = append(r.callbacks, f)
 }

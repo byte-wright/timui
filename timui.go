@@ -81,7 +81,6 @@ func (t *Timui) Finish() {
 			pos := mathi.Vec2{X: i % t.front.Size.X, Y: i / t.front.Size.X}
 			t.backend.Set(pos, fc.Char, uint32(fc.FG), uint32(fc.BG))
 		}
-
 	}
 
 	t.backend.Render()
@@ -89,8 +88,9 @@ func (t *Timui) Finish() {
 	// todo screen resizing
 	t.back, t.front = t.front, t.back
 
-	t.back.Resize(t.backend.Size())
-	t.front.Resize(t.backend.Size())
+	size := t.backend.Size()
+	t.back.Resize(size)
+	t.front.Resize(size)
 
 	t.front.SetScreen(' ', uint32(t.Theme.Text), uint32(t.Theme.BG))
 
