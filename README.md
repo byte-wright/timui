@@ -1,6 +1,8 @@
 TIMUI
 =====
 
+**Disclaimer:** This is a personal pet project / experiment
+
 is a terminal ui immediate mode user interface library.
 inspired by https://github.com/ocornut/imgui
 
