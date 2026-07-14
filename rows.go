@@ -1,46 +1,22 @@
 package timui
 
-import (
-	"gitlab.com/bytewright/gmath/mathi"
-)
-
-type Rows struct {
-	g         *Timui
-	positions []splitRange
-	area      mathi.Box2
-	row       int
-}
-
-func (g *Timui) Rows(pos *SplitOptions) *Rows {
-	positions := pos.calculatePositions(g.CurrentArea().Size().Y)
-
-	area := g.CurrentArea()
-	firstArea := *area
-	yStart := firstArea.From.Y
-	firstArea.From.Y = yStart + positions[0].from
-	firstArea.To.Y = yStart + positions[0].to
-
-	g.PushArea(firstArea)
-
-	return &Rows{
-		g:         g,
-		positions: positions,
-		area:      *area,
+// Rows splits the current area vertically and runs one cell func per split
+// entry, each inside its row area. Panics if the cell count does not match
+// the split count.
+func (g *Timui) Rows(opts *SplitOptions, cells ...func()) {
+	positions := opts.calculatePositions(g.CurrentArea().Size().Y)
+	if len(cells) != len(positions) {
+		panic("rows cell count must match split count")
 	}
-}
 
-func (s *Rows) Next() {
-	s.g.PopArea()
-	s.row += 1
-
-	area := s.area
+	area := *g.CurrentArea()
 	yStart := area.From.Y
-	area.From.Y = yStart + s.positions[s.row].from
-	area.To.Y = yStart + s.positions[s.row].to
 
-	s.g.PushArea(area)
-}
+	for i, cell := range cells {
+		cellArea := area
+		cellArea.From.Y = yStart + positions[i].from
+		cellArea.To.Y = yStart + positions[i].to
 
-func (s *Rows) Finish() {
-	s.g.PopArea()
+		g.WithArea(cellArea, cell)
+	}
 }

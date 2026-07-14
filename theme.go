@@ -6,6 +6,7 @@ type Theme struct {
 	BorderLine  RGBColor
 	BorderBG    RGBColor
 	Widget      WidgetTheme
+	ScrollBar   ScrollBarTheme
 	BorderStyle BorderStyle
 }
 
@@ -16,6 +17,14 @@ type WidgetTheme struct {
 	HoverBG    RGBColor
 	InteractBG RGBColor
 	FocusLine  RGBColor
+}
+
+type ScrollBarTheme struct {
+	Text    RGBColor
+	BG      RGBColor
+	ArrowBG RGBColor
+	Knob    RGBColor
+	KnobBG  RGBColor
 }
 
 type BorderStyle struct {
@@ -36,6 +45,13 @@ var DefaultTheme = Theme{
 		HoverBG:    MustRGBS("#22a"),
 		InteractBG: MustRGBS("#008"),
 		FocusLine:  MustRGBS("#ffa"),
+	},
+	ScrollBar: ScrollBarTheme{
+		Text:    MustRGBS("#bbb"),
+		BG:      MustRGBS("#013"),
+		ArrowBG: MustRGBS("#135"),
+		Knob:    MustRGBS("#46f"),
+		KnobBG:  MustRGBS("#00a"),
 	},
 	BorderStyle: BorderDouble,
 }

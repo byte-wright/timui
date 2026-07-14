@@ -36,3 +36,10 @@ func (t *Timui) ClipContains(pos mathi.Vec2) bool {
 func (g *Timui) PopClip() {
 	g.clipManager.clips = g.clipManager.clips[:len(g.clipManager.clips)-1]
 }
+
+// WithClip runs body with drawing clipped to area.
+func (g *Timui) WithClip(area mathi.Box2, body func()) {
+	g.PushClip(area)
+	body()
+	g.PopClip()
+}

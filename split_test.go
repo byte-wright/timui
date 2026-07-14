@@ -57,7 +57,7 @@ func TestSplitFactors(t *testing.T) {
 	})
 
 	expect.Value(t, "split case",
-		Split().Fixed(12).Factor(0.3, 0.4, 0.5, 0.6, 0.5).insertFixedBetween(1).calculatePositions(200),
+		Split().Fixed(12).Factor(0.3, 0.4, 0.5, 0.6, 0.5).withFixedBetween(1).calculatePositions(200),
 	).ToBe([]splitRange{
 		{from: 0, to: 1},
 		{from: 1, to: 13},

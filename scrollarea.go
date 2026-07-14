@@ -31,25 +31,24 @@ func (g *Timui) ScrollAreaV(id string, body func()) {
 	area := *g.CurrentArea()
 	area.To.X -= 1
 
-	g.PushArea(area)
-	g.PushClip(area)
 	overflow := scrollArea.contentHeight - area.Size().Y
 	if overflow < 0 {
 		overflow = 0
 	}
-	g.PushAreaTranslation(mathi.Vec2{Y: -int(float32(overflow) * scrollArea.factor)})
 
-	topY := g.CurrentArea().From.Y
+	g.WithArea(area, func() {
+		g.WithClip(area, func() {
+			g.WithAreaTranslation(mathi.Vec2{Y: -int(float32(overflow) * scrollArea.factor)}, func() {
+				topY := g.CurrentArea().From.Y
 
-	body()
+				body()
 
-	scrollArea.contentHeight = g.CurrentArea().From.Y - topY
+				scrollArea.contentHeight = g.CurrentArea().From.Y - topY
+			})
+		})
+	})
 
 	barWidth := 1
-
-	g.PopArea()
-	g.PopClip()
-	g.PopArea()
 
 	areaHeight := g.CurrentArea().Size().Y
 	minHeight := 1
@@ -58,48 +57,45 @@ func (g *Timui) ScrollAreaV(id string, body func()) {
 	if factor > 1 {
 		factor = 1
 	}
-	knobHeight := minHeight + int(float32(areaHeight-minHeight-2)*factor)
 
-	// draw bar background
+	trackHeight := areaHeight - 2
+	knobHeight := minHeight + int(float32(trackHeight-minHeight)*factor)
+	knobRange := trackHeight - knobHeight
+
 	barArea := *g.CurrentArea()
 	barArea.From.X = barArea.To.X - barWidth
-	size := barArea.Size()
 
-	g.PushArea(barArea)
-	g.SetArea(' ', MustRGBS("#bbb"), MustRGBS("#013"))
+	bar := g.Theme.ScrollBar
 
-	g.Set(barArea.From, '▴', MustRGBS("#bbb"), MustRGBS("#135"))
-	g.Set(mathi.Vec2{X: barArea.From.X, Y: barArea.To.Y - 1}, '▾', MustRGBS("#bbb"), MustRGBS("#135"))
+	g.WithArea(barArea, func() {
+		g.SetArea(' ', bar.Text, bar.BG)
 
-	g.PopArea()
+		g.Set(barArea.From, '▴', bar.Text, bar.ArrowBG)
+		g.Set(mathi.Vec2{X: barArea.From.X, Y: barArea.To.Y - 1}, '▾', bar.Text, bar.ArrowBG)
+	})
 
-	// draw knob
-	knobTop := int(float32(size.Y-knobHeight-2) * scrollArea.factor)
-	knobArea := *g.CurrentArea()
-	knobArea.From.X = knobArea.To.X - barWidth
+	knobTop := int(float32(knobRange) * scrollArea.factor)
+	knobArea := barArea
 	knobArea.From.Y = knobArea.From.Y + 1 + knobTop
 	knobArea.To.Y = knobArea.From.Y + knobHeight
 
-	if knobHeight < size.Y { // why?
-		g.PushArea(knobArea)
-		g.SetArea('░', MustRGBS("#46f"), MustRGBS("#00a"))
-		g.PopArea()
+	if knobHeight > 0 && knobHeight <= trackHeight {
+		g.WithArea(knobArea, func() {
+			g.SetArea('░', bar.Knob, bar.KnobBG)
+		})
 
-		g.PushArea(barArea)
+		g.WithArea(barArea, func() {
+			dragArea := mathi.Box2{From: mathi.Vec2{Y: 1}, To: mathi.Vec2{X: barWidth, Y: areaHeight - 1}}
 
-		dragAreaSize := g.CurrentArea().Size()
+			pos := mathi.Vec2{Y: knobTop}
 
-		dragArea := mathi.Box2{From: mathi.Vec2{Y: 1}, To: mathi.Vec2{X: barWidth, Y: dragAreaSize.Y - 1}}
+			g.Draggable("draggable", dragArea, mathi.Vec2{X: barWidth, Y: knobHeight}, &pos)
 
-		pos := mathi.Vec2{Y: knobTop}
-
-		g.Draggable("draggable", dragArea, mathi.Vec2{X: barWidth, Y: knobHeight}, &pos)
-
-		scrollArea.factor = 0
-		if size.Y-knobHeight-2 > 0 {
-			scrollArea.factor = float32(pos.Y) / float32(size.Y-knobHeight-2)
-		}
-		g.PopArea()
+			scrollArea.factor = 0
+			if knobRange > 0 {
+				scrollArea.factor = float32(pos.Y) / float32(knobRange)
+			}
+		})
 	}
 
 	g.id.Pop()

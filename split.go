@@ -39,18 +39,19 @@ func (s *SplitOptions) Fixed(fixed ...int) *SplitOptions {
 	return s
 }
 
-func (s *SplitOptions) insertFixedBetween(v int) *SplitOptions {
-	ns := []split{}
+// withFixedBetween returns a copy with a fixed-size entry interleaved around
+// every split; the receiver is left untouched so it can be reused across
+// frames.
+func (s *SplitOptions) withFixedBetween(v int) *SplitOptions {
+	ns := &SplitOptions{padding: s.padding}
+	ns.splits = make([]split, 0, len(s.splits)*2+1)
 
-	ns = append(ns, split{fixed: v})
+	ns.splits = append(ns.splits, split{fixed: v})
 	for _, f := range s.splits {
-		ns = append(ns, f)
-		ns = append(ns, split{fixed: v})
+		ns.splits = append(ns.splits, f, split{fixed: v})
 	}
 
-	s.splits = ns
-
-	return s
+	return ns
 }
 
 func (s *SplitOptions) Pad(padding int) *SplitOptions {

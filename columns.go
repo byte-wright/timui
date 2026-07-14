@@ -1,53 +1,30 @@
 package timui
 
-import (
-	"gitlab.com/bytewright/gmath/mathi"
-)
-
-type Columns struct {
-	g         *Timui
-	positions []splitRange
-	area      mathi.Box2
-	column    int
-	maxCursor int
-}
-
-func (g *Timui) Columns(opts *SplitOptions) *Columns {
+// Columns splits the current area horizontally and runs one cell func per
+// split entry, each inside its column area. Afterwards the parent cursor is
+// advanced to the bottom of the tallest column. Panics if the cell count
+// does not match the split count.
+func (g *Timui) Columns(opts *SplitOptions, cells ...func()) {
 	positions := opts.calculatePositions(g.CurrentArea().Size().X)
-
-	area := g.CurrentArea()
-	firstArea := *area
-	firstArea.From.X = area.From.X + positions[0].from
-	firstArea.To.X = area.From.X + positions[0].to
-
-	g.PushArea(firstArea)
-
-	return &Columns{
-		g:         g,
-		positions: positions,
-		area:      *area,
+	if len(cells) != len(positions) {
+		panic("columns cell count must match split count")
 	}
-}
 
-func (s *Columns) Next() {
-	if s.g.CurrentArea().From.Y > s.maxCursor {
-		s.maxCursor = s.g.CurrentArea().From.Y
+	area := *g.CurrentArea()
+	maxCursor := area.From.Y
+
+	for i, cell := range cells {
+		cellArea := area
+		cellArea.From.X = area.From.X + positions[i].from
+		cellArea.To.X = area.From.X + positions[i].to
+
+		g.WithArea(cellArea, func() {
+			cell()
+			if g.CurrentArea().From.Y > maxCursor {
+				maxCursor = g.CurrentArea().From.Y
+			}
+		})
 	}
-	s.g.PopArea()
-	s.column += 1
 
-	area := s.area
-	area.From.X = s.area.From.X + s.positions[s.column].from
-	area.To.X = s.area.From.X + s.positions[s.column].to
-
-	s.g.PushArea(area)
-}
-
-func (s *Columns) Finish() {
-	if s.g.CurrentArea().From.Y > s.maxCursor {
-		s.maxCursor = s.g.CurrentArea().From.Y
-	}
-	s.g.PopArea()
-
-	s.g.CurrentArea().From.Y = s.maxCursor
+	g.CurrentArea().From.Y = maxCursor
 }

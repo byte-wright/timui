@@ -71,8 +71,10 @@ func (t *Timui) runAfter(f func()) {
 }
 
 func (t *Timui) Finish() {
-	for _, f := range t.after {
-		f()
+	// index loop because deferred callbacks may append more (dropdown inside a
+	// dialog); nested overlays run after their parent and so paint on top
+	for i := 0; i < len(t.after); i++ {
+		t.after[i]()
 	}
 
 	for i := range t.front.Chars {
@@ -125,6 +127,20 @@ func (t *Timui) PushAreaTranslation(dir mathi.Vec2) {
 
 func (t *Timui) PopArea() {
 	t.area = t.area[:len(t.area)-1]
+}
+
+// WithArea runs body with area as the current area.
+func (t *Timui) WithArea(area mathi.Box2, body func()) {
+	t.PushArea(area)
+	body()
+	t.PopArea()
+}
+
+// WithAreaTranslation runs body with the current area translated by dir.
+func (t *Timui) WithAreaTranslation(dir mathi.Vec2, body func()) {
+	t.PushAreaTranslation(dir)
+	body()
+	t.PopArea()
 }
 
 func (t *Timui) GetMousePosition() mathi.Vec2 {

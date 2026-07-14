@@ -58,47 +58,47 @@ func (g *Timui) Dropdown(id string, elements int, selected *int, paint func(i in
 			height := dd.elements
 
 			area.To.Y = area.From.Y + height + 2
-			g.PushArea(area)
 
-			g.Border(dropdownBordeStyleLine, g.Theme.Widget.Line, g.Theme.Widget.BG)
+			g.WithArea(area, func() {
+				g.Border(dropdownBordeStyleLine, g.Theme.Widget.Line, g.Theme.Widget.BG)
 
-			g.Pad(1, 1, 1, 1, func() {
-				g.SetArea(' ', g.Theme.Widget.Text, g.Theme.Widget.BG)
+				g.Pad(1, 1, 1, 1, func() {
+					g.SetArea(' ', g.Theme.Widget.Text, g.Theme.Widget.BG)
 
-				g.id.Push("selection")
+					g.id.Push("selection")
 
-				for i := 0; i < dd.elements; i++ {
-					ma := *g.CurrentArea()
+					for i := 0; i < dd.elements; i++ {
+						ma := *g.CurrentArea()
 
-					ma.To.Y = ma.From.Y + 1
-					g.PushArea(ma)
+						ma.To.Y = ma.From.Y + 1
 
-					mi := g.MouseInputForSize(strconv.Itoa(i), ma.Size())
+						g.WithArea(ma, func() {
+							mi := g.MouseInputForSize(strconv.Itoa(i), ma.Size())
 
-					if mi.Hovered() > 0 || i == *selected {
-						g.HLine(dropdownSelectionStyle, g.Theme.Widget.Text, g.Theme.Widget.HoverBG)
+							if mi.Hovered() > 0 || i == *selected {
+								g.HLine(dropdownSelectionStyle, g.Theme.Widget.Text, g.Theme.Widget.HoverBG)
+							}
+
+							if mi.LeftReleased() {
+								*selected = i
+								dd.open = false
+							}
+						})
+
+						ma.From.X += 1
+						ma.To.X -= 1
+
+						g.WithArea(ma, func() {
+							dd.paint(i, dd.selected == i)
+						})
+
+						g.moveCursor(mathi.Vec2{Y: 1})
 					}
 
-					if mi.LeftReleased() {
-						*selected = i
-						dd.open = false
-					}
-
-					g.PopArea()
-
-					ma.From.X += 1
-					ma.To.X -= 1
-
-					g.PushArea(ma)
-					dd.paint(i, dd.selected == i)
-					g.PopArea()
-
-					g.moveCursor(mathi.Vec2{Y: 1})
-				}
-
-				g.id.Pop()
+					g.id.Pop()
+				})
 			})
-			g.PopArea()
+
 			g.id.Pop()
 		})
 	}
@@ -136,10 +136,12 @@ func (d *dropdown) paintSelection(theme *Theme) {
 	a.To.Y = a.From.Y
 	a.From.X += 2
 	a.To.X -= 5
-	d.g.PushArea(a)
-	d.g.SetArea(0, theme.Widget.Text, bgCol)
-	d.paint(d.selected, false)
-	d.g.PopArea()
+
+	d.g.WithArea(a, func() {
+		d.g.SetArea(0, theme.Widget.Text, bgCol)
+		d.paint(d.selected, false)
+	})
+
 	d.g.moveCursor(mathi.Vec2{Y: 1})
 }
 

@@ -8,9 +8,5 @@ func (t *Timui) Pad(top, right, bottom, left int, body func()) {
 	area.To.X -= right
 	area.To.Y -= bottom
 
-	t.PushArea(area)
-
-	body()
-
-	t.PopArea()
+	t.WithArea(area, body)
 }

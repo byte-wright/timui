@@ -36,49 +36,14 @@ func MustRGBAS(s string) RGBAColor {
 	return col
 }
 
+// RGBAS parses "#rgba" or "#rrggbbaa" into an RGBAColor.
 func RGBAS(s string) (RGBAColor, error) {
-	if len(s) == 0 || s[0] != '#' {
-		return RGBA(0, 0, 0, 0x88), fmt.Errorf("Color must begin with '#'")
-	}
-
-	var err error
-
-	hexToByte := func(b byte) byte {
-		switch {
-		case b >= '0' && b <= '9':
-			return b - '0'
-		case b >= 'a' && b <= 'f':
-			return b - 'a' + 10
-		case b >= 'A' && b <= 'F':
-			return b - 'A' + 10
-		}
-		err = fmt.Errorf("invalid color format '%v'", s)
-
-		return 0
-	}
-
-	r, g, b, a := 0, 0, 0, 0
-
-	switch len(s) {
-	case 9:
-		r = int(hexToByte(s[1])<<4 + hexToByte(s[2]))
-		g = int(hexToByte(s[3])<<4 + hexToByte(s[4]))
-		b = int(hexToByte(s[5])<<4 + hexToByte(s[6]))
-		a = int(hexToByte(s[7])<<4 + hexToByte(s[8]))
-	case 5:
-		r = int(hexToByte(s[1]) * 17)
-		g = int(hexToByte(s[2]) * 17)
-		b = int(hexToByte(s[3]) * 17)
-		a = int(hexToByte(s[4]) * 17)
-	default:
-		return RGBA(0, 0, 0, 0x88), fmt.Errorf("invalid color format '%v'", s)
-	}
-
+	c, err := parseHexChannels(s, 4)
 	if err != nil {
 		return RGBA(0, 0, 0, 0x88), err
 	}
 
-	return RGBA(r, g, b, a), err
+	return RGBA(c[0], c[1], c[2], c[3]), nil
 }
 
 func RGB(r, g, b int) RGBColor {
@@ -94,47 +59,65 @@ func MustRGBS(s string) RGBColor {
 	return col
 }
 
+// RGBS parses "#rgb" or "#rrggbb" into an RGBColor.
 func RGBS(s string) (RGBColor, error) {
-	if len(s) == 0 || s[0] != '#' {
-		return RGB(0, 0, 0), fmt.Errorf("Color must begin with '#'")
-	}
-
-	var err error
-
-	hexToByte := func(b byte) byte {
-		switch {
-		case b >= '0' && b <= '9':
-			return b - '0'
-		case b >= 'a' && b <= 'f':
-			return b - 'a' + 10
-		case b >= 'A' && b <= 'F':
-			return b - 'A' + 10
-		}
-		err = fmt.Errorf("invalid color format '%v'", s)
-
-		return 0
-	}
-
-	r, g, b := 0, 0, 0
-
-	switch len(s) {
-	case 7:
-		r = int(hexToByte(s[1])<<4 + hexToByte(s[2]))
-		g = int(hexToByte(s[3])<<4 + hexToByte(s[4]))
-		b = int(hexToByte(s[5])<<4 + hexToByte(s[6]))
-	case 4:
-		r = int(hexToByte(s[1]) * 17)
-		g = int(hexToByte(s[2]) * 17)
-		b = int(hexToByte(s[3]) * 17)
-	default:
-		return RGB(0, 0, 0), fmt.Errorf("invalid color format '%v'", s)
-	}
-
+	c, err := parseHexChannels(s, 3)
 	if err != nil {
 		return RGB(0, 0, 0), err
 	}
 
-	return RGB(r, g, b), err
+	return RGB(c[0], c[1], c[2]), nil
+}
+
+// parseHexChannels reads "#" followed by either count hex digits (short form,
+// each digit doubled) or count*2 digits (one byte per channel).
+func parseHexChannels(s string, count int) ([4]int, error) {
+	var c [4]int
+
+	if len(s) == 0 || s[0] != '#' {
+		return c, fmt.Errorf("color must begin with '#'")
+	}
+
+	digits := s[1:]
+
+	nibble := func(b byte) (int, bool) {
+		switch {
+		case b >= '0' && b <= '9':
+			return int(b - '0'), true
+		case b >= 'a' && b <= 'f':
+			return int(b-'a') + 10, true
+		case b >= 'A' && b <= 'F':
+			return int(b-'A') + 10, true
+		}
+
+		return 0, false
+	}
+
+	switch len(digits) {
+	case count:
+		for i := 0; i < count; i++ {
+			v, ok := nibble(digits[i])
+			if !ok {
+				return c, fmt.Errorf("invalid color format '%v'", s)
+			}
+
+			c[i] = v * 17
+		}
+	case count * 2:
+		for i := 0; i < count; i++ {
+			hi, hiOK := nibble(digits[i*2])
+			lo, loOK := nibble(digits[i*2+1])
+			if !hiOK || !loOK {
+				return c, fmt.Errorf("invalid color format '%v'", s)
+			}
+
+			c[i] = hi<<4 + lo
+		}
+	default:
+		return c, fmt.Errorf("invalid color format '%v'", s)
+	}
+
+	return c, nil
 }
 
 func (rgb RGBColor) RGB() (int, int, int) {

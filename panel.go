@@ -9,47 +9,40 @@ type Panel struct {
 	area mathi.Box2
 }
 
-func (t *Timui) Panel() *Panel {
+// Panel draws a bordered container and runs body inside its padded area.
+func (t *Timui) Panel(body func(p *Panel)) {
 	t.Border(t.Theme.BorderStyle.Rect, t.Theme.BorderLine, t.Theme.BorderBG)
 
 	area := *t.CurrentArea()
-	originalArea := area
+	p := &Panel{t: t, area: area}
 
 	pad := mathi.Vec2{X: 2, Y: 1}
-	area.From = area.From.Add(pad)
-	area.To = area.To.Sub(pad)
+	padded := area
+	padded.From = padded.From.Add(pad)
+	padded.To = padded.To.Sub(pad)
 
-	t.PushArea(area)
-
-	return &Panel{
-		t:    t,
-		area: originalArea,
-	}
+	t.WithArea(padded, func() {
+		body(p)
+	})
 }
 
 func (p *Panel) HLine() {
-	pos := p.t.CurrentArea()
-	y := pos.From.Y
-
 	a := p.area
-	a.From.Y = y
+	a.From.Y = p.t.CurrentArea().From.Y
 
-	p.t.PushArea(a)
+	p.t.WithArea(a, func() {
+		p.t.HLine(p.t.Theme.BorderStyle.Horizontal, p.t.Theme.BorderLine, p.t.Theme.BorderBG)
+	})
 
-	p.t.HLine(p.t.Theme.BorderStyle.Horizontal, p.t.Theme.BorderLine, p.t.Theme.BorderBG)
-
-	p.t.PopArea()
+	p.t.moveCursor(mathi.Vec2{Y: 1})
 }
 
-func (p *Panel) Header() {
-	p.t.PopArea()
-	area := *p.t.CurrentArea()
+// Header runs body inside a one-row strip on the panel's top border line.
+func (p *Panel) Header(body func()) {
+	area := p.area
 	area.To.Y = area.From.Y + 1
 	area.From.X += 2
 	area.To.X -= 2
-	p.t.PushArea(area)
-}
 
-func (p *Panel) Finish() {
-	p.t.PopArea()
+	p.t.WithArea(area, body)
 }
