@@ -10,7 +10,7 @@ import (
 )
 
 func TestGridCellAreas(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	areas := []mathi.Box2{}
 	cell := func(*timui.GridCell) { areas = append(areas, *tui.CurrentArea()) }
@@ -26,7 +26,7 @@ func TestGridCellAreas(t *testing.T) {
 }
 
 func TestGridDividerJunctions(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	tui.Grid(func(grid *timui.Grid) {
 		grid.Rows(timui.Split().Fixed(2).Factor(1),
@@ -54,7 +54,7 @@ func TestGridDividerJunctions(t *testing.T) {
 }
 
 func TestGridPanicsOnCellCountMismatch(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	defer func() {
 		expect.Value(t, "recovered panic", recover() != nil).ToBe(true)
@@ -66,7 +66,7 @@ func TestGridPanicsOnCellCountMismatch(t *testing.T) {
 }
 
 func TestGridLeavesSplitOptionsUntouched(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	split := timui.Split().Factor(1, 1)
 

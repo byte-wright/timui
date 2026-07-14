@@ -10,7 +10,7 @@ import (
 )
 
 func TestPanelAreas(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	bodyArea := mathi.Box2{}
 	headerArea := mathi.Box2{}

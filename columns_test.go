@@ -10,7 +10,7 @@ import (
 )
 
 func TestColumnsCellAreas(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	areas := []mathi.Box2{}
 	cell := func() { areas = append(areas, *tui.CurrentArea()) }
@@ -24,7 +24,7 @@ func TestColumnsCellAreas(t *testing.T) {
 }
 
 func TestColumnsAdvanceCursorToTallestColumn(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	tui.Columns(timui.Split().Factor(1, 1),
 		func() { tui.MoveCursorForTest(mathi.Vec2{Y: 3}) },
@@ -35,7 +35,7 @@ func TestColumnsAdvanceCursorToTallestColumn(t *testing.T) {
 }
 
 func TestColumnsPanicsOnCellCountMismatch(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	defer func() {
 		expect.Value(t, "recovered panic", recover() != nil).ToBe(true)

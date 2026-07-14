@@ -10,7 +10,7 @@ import (
 )
 
 func TestRowsCellAreas(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	areas := []mathi.Box2{}
 	cell := func() { areas = append(areas, *tui.CurrentArea()) }
@@ -24,7 +24,7 @@ func TestRowsCellAreas(t *testing.T) {
 }
 
 func TestRowsPanicsOnCellCountMismatch(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	defer func() {
 		expect.Value(t, "recovered panic", recover() != nil).ToBe(true)

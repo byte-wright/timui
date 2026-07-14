@@ -5,15 +5,13 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/byte-wright/expect"
 	"github.com/byte-wright/timui"
 	"github.com/byte-wright/timui/internal/test"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
 func TestSnapshotWidgets(t *testing.T) {
-	be := test.NewBackend(30, 12)
-	tui := timui.New(be)
+	tui, be := test.New(t, 30, 12)
 
 	checkedOn := true
 	checkedOff := false
@@ -30,12 +28,11 @@ func TestSnapshotWidgets(t *testing.T) {
 
 	tui.Finish()
 
-	expect.Value(t, "widgets", be.String()).ToBeSnapshot("testdata/widgets.txt")
+	be.CheckSnapshot("testdata/widgets.txt")
 }
 
 func TestSnapshotPanel(t *testing.T) {
-	be := test.NewBackend(24, 8)
-	tui := timui.New(be)
+	tui, be := test.New(t, 24, 8)
 
 	tui.Panel(func(p *timui.Panel) {
 		p.Header(func() { tui.Label(" Panel ") })
@@ -46,12 +43,11 @@ func TestSnapshotPanel(t *testing.T) {
 
 	tui.Finish()
 
-	expect.Value(t, "panel", be.String()).ToBeSnapshot("testdata/panel.txt")
+	be.CheckSnapshot("testdata/panel.txt")
 }
 
 func TestSnapshotGrid(t *testing.T) {
-	be := test.NewBackend(40, 12)
-	tui := timui.New(be)
+	tui, be := test.New(t, 40, 12)
 
 	tui.Grid(func(grid *timui.Grid) {
 		grid.Rows(timui.Split().Fixed(3).Factor(1),
@@ -67,12 +63,11 @@ func TestSnapshotGrid(t *testing.T) {
 
 	tui.Finish()
 
-	expect.Value(t, "grid", be.String()).ToBeSnapshot("testdata/grid.txt")
+	be.CheckSnapshot("testdata/grid.txt")
 }
 
 func TestSnapshotDialog(t *testing.T) {
-	be := test.NewBackend(40, 12)
-	tui := timui.New(be)
+	tui, be := test.New(t, 40, 12)
 
 	visible := true
 
@@ -83,12 +78,11 @@ func TestSnapshotDialog(t *testing.T) {
 
 	tui.Finish()
 
-	expect.Value(t, "dialog", be.String()).ToBeSnapshot("testdata/dialog.txt")
+	be.CheckSnapshot("testdata/dialog.txt")
 }
 
 func TestSnapshotScrollArea(t *testing.T) {
-	be := test.NewBackend(16, 8)
-	tui := timui.New(be)
+	tui, be := test.New(t, 16, 8)
 
 	frame := func() {
 		tui.ScrollAreaV("list", func() {
@@ -103,12 +97,11 @@ func TestSnapshotScrollArea(t *testing.T) {
 	frame()
 	frame()
 
-	expect.Value(t, "scrollarea", be.String()).ToBeSnapshot("testdata/scrollarea.txt")
+	be.CheckSnapshot("testdata/scrollarea.txt")
 }
 
 func TestSnapshotDropdownOpen(t *testing.T) {
-	be := test.NewBackend(20, 10)
-	tui := timui.New(be)
+	tui, be := test.New(t, 20, 10)
 
 	selected := 1
 	frame := func() {
@@ -126,5 +119,5 @@ func TestSnapshotDropdownOpen(t *testing.T) {
 	frame()
 	frame()
 
-	expect.Value(t, "open dropdown", be.String()).ToBeSnapshot("testdata/dropdown-open.txt")
+	be.CheckSnapshot("testdata/dropdown-open.txt")
 }

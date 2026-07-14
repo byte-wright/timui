@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"github.com/byte-wright/expect"
-	"github.com/byte-wright/timui"
 	"github.com/byte-wright/timui/internal/test"
 )
 
 func TestFinishRunsNestedDeferred(t *testing.T) {
-	tui := timui.New(test.NewBackend(20, 10))
+	tui, _ := test.New(t, 20, 10)
 
 	order := []string{}
 	tui.RunAfterForTest(func() {

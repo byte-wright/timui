@@ -5,15 +5,13 @@ import (
 	"testing"
 
 	"github.com/byte-wright/expect"
-	"github.com/byte-wright/timui"
 	"github.com/byte-wright/timui/internal/test"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
 func TestDropdownOverlaySelectsItem(t *testing.T) {
-	be := test.NewBackend(30, 15)
+	tui, be := test.New(t, 30, 15)
 	be.Mouse = mathi.Vec2{X: 5, Y: 0}
-	tui := timui.New(be)
 
 	selected := 0
 	frame := func() {
