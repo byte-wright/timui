@@ -1,19 +1,21 @@
-package timui
+package timui_test
 
 import (
 	"testing"
 
 	"github.com/byte-wright/expect"
+	"github.com/byte-wright/timui"
+	"github.com/byte-wright/timui/internal/test"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
 func TestPanelAreas(t *testing.T) {
-	tui := New(&testBackend{size: mathi.Vec2{X: 20, Y: 10}})
+	tui := timui.New(test.NewBackend(20, 10))
 
 	bodyArea := mathi.Box2{}
 	headerArea := mathi.Box2{}
 
-	tui.Panel(func(p *Panel) {
+	tui.Panel(func(p *timui.Panel) {
 		bodyArea = *tui.CurrentArea()
 
 		p.Header(func() {

@@ -1,19 +1,20 @@
-package timui
+package timui_test
 
 import (
 	"testing"
 
 	"github.com/byte-wright/expect"
-	"gitlab.com/bytewright/gmath/mathi"
+	"github.com/byte-wright/timui"
+	"github.com/byte-wright/timui/internal/test"
 )
 
 func TestFinishRunsNestedDeferred(t *testing.T) {
-	tui := New(&testBackend{size: mathi.Vec2{X: 20, Y: 10}})
+	tui := timui.New(test.NewBackend(20, 10))
 
 	order := []string{}
-	tui.runAfter(func() {
+	tui.RunAfterForTest(func() {
 		order = append(order, "outer")
-		tui.runAfter(func() {
+		tui.RunAfterForTest(func() {
 			order = append(order, "nested")
 		})
 	})

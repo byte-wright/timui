@@ -1,69 +1,19 @@
-package timui
+package timui_test
 
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/byte-wright/expect"
+	"github.com/byte-wright/timui"
+	"github.com/byte-wright/timui/internal/test"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-// snapshotBackend accumulates the pushed cell diffs like a real terminal, so
-// after any Finish its grid equals that frame's front buffer.
-type snapshotBackend struct {
-	size    mathi.Vec2
-	chars   [][]rune
-	mouse   mathi.Vec2
-	pressed bool
-}
-
-func newSnapshotBackend(x, y int) *snapshotBackend {
-	chars := make([][]rune, y)
-	for i := range chars {
-		chars[i] = make([]rune, x)
-		for j := range chars[i] {
-			chars[i][j] = ' '
-		}
-	}
-
-	return &snapshotBackend{
-		size:  mathi.Vec2{X: x, Y: y},
-		chars: chars,
-		mouse: mathi.Vec2{X: -1, Y: -1},
-	}
-}
-
-func (b *snapshotBackend) Size() mathi.Vec2          { return b.size }
-func (b *snapshotBackend) MousePosition() mathi.Vec2 { return b.mouse }
-func (b *snapshotBackend) MousePressed(key Key) bool { return b.pressed }
-func (b *snapshotBackend) Render()                   {}
-
-func (b *snapshotBackend) Set(pos mathi.Vec2, char rune, fg, bg uint32) {
-	if char != 0 {
-		b.chars[pos.Y][pos.X] = char
-	}
-}
-
-// String frames the screen so snapshot files keep their trailing spaces even
-// through editors that trim whitespace.
-func (b *snapshotBackend) String() string {
-	border := "+" + strings.Repeat("-", b.size.X) + "+\n"
-
-	sb := strings.Builder{}
-	sb.WriteString(border)
-	for _, row := range b.chars {
-		sb.WriteString("|" + string(row) + "|\n")
-	}
-	sb.WriteString(border)
-
-	return sb.String()
-}
-
 func TestSnapshotWidgets(t *testing.T) {
-	be := newSnapshotBackend(30, 12)
-	tui := New(be)
+	be := test.NewBackend(30, 12)
+	tui := timui.New(be)
 
 	checkedOn := true
 	checkedOff := false
@@ -73,7 +23,7 @@ func TestSnapshotWidgets(t *testing.T) {
 	tui.Button("Click me")
 	tui.Checkbox("on", &checkedOn)
 	tui.Checkbox("off", &checkedOff)
-	OptionGroup(tui, "group", &option, func(og *OptionGroupElement[string]) {
+	timui.OptionGroup(tui, "group", &option, func(og *timui.OptionGroupElement[string]) {
 		og.Option("Alpha", "a")
 		og.Option("Beta", "b")
 	})
@@ -84,10 +34,10 @@ func TestSnapshotWidgets(t *testing.T) {
 }
 
 func TestSnapshotPanel(t *testing.T) {
-	be := newSnapshotBackend(24, 8)
-	tui := New(be)
+	be := test.NewBackend(24, 8)
+	tui := timui.New(be)
 
-	tui.Panel(func(p *Panel) {
+	tui.Panel(func(p *timui.Panel) {
 		p.Header(func() { tui.Label(" Panel ") })
 		tui.Label("line one")
 		p.HLine()
@@ -100,16 +50,16 @@ func TestSnapshotPanel(t *testing.T) {
 }
 
 func TestSnapshotGrid(t *testing.T) {
-	be := newSnapshotBackend(40, 12)
-	tui := New(be)
+	be := test.NewBackend(40, 12)
+	tui := timui.New(be)
 
-	tui.Grid(func(grid *Grid) {
-		grid.Rows(Split().Fixed(3).Factor(1),
-			func(*GridCell) { tui.Label("top") },
-			func(cell *GridCell) {
-				cell.Columns(Split().Factor(1, 1),
-					func(*GridCell) { tui.Label("left") },
-					func(*GridCell) { tui.Label("right") },
+	tui.Grid(func(grid *timui.Grid) {
+		grid.Rows(timui.Split().Fixed(3).Factor(1),
+			func(*timui.GridCell) { tui.Label("top") },
+			func(cell *timui.GridCell) {
+				cell.Columns(timui.Split().Factor(1, 1),
+					func(*timui.GridCell) { tui.Label("left") },
+					func(*timui.GridCell) { tui.Label("right") },
 				)
 			},
 		)
@@ -121,8 +71,8 @@ func TestSnapshotGrid(t *testing.T) {
 }
 
 func TestSnapshotDialog(t *testing.T) {
-	be := newSnapshotBackend(40, 12)
-	tui := New(be)
+	be := test.NewBackend(40, 12)
+	tui := timui.New(be)
 
 	visible := true
 
@@ -137,8 +87,8 @@ func TestSnapshotDialog(t *testing.T) {
 }
 
 func TestSnapshotScrollArea(t *testing.T) {
-	be := newSnapshotBackend(16, 8)
-	tui := New(be)
+	be := test.NewBackend(16, 8)
+	tui := timui.New(be)
 
 	frame := func() {
 		tui.ScrollAreaV("list", func() {
@@ -157,8 +107,8 @@ func TestSnapshotScrollArea(t *testing.T) {
 }
 
 func TestSnapshotDropdownOpen(t *testing.T) {
-	be := newSnapshotBackend(20, 10)
-	tui := New(be)
+	be := test.NewBackend(20, 10)
+	tui := timui.New(be)
 
 	selected := 1
 	frame := func() {
@@ -168,11 +118,11 @@ func TestSnapshotDropdownOpen(t *testing.T) {
 		tui.Finish()
 	}
 
-	be.mouse = mathi.Vec2{X: 5, Y: 0}
+	be.Mouse = mathi.Vec2{X: 5, Y: 0}
 	frame()
-	be.pressed = true
+	be.Pressed = true
 	frame()
-	be.pressed = false
+	be.Pressed = false
 	frame()
 	frame()
 

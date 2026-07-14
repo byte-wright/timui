@@ -23,8 +23,9 @@ while the demo runs (see [util/redirstd.go](util/redirstd.go)), because the TUI
 owns the terminal. Check those files when debugging a crash.
 
 Rendering is pinned by snapshot tests ([snapshot_test.go](snapshot_test.go)):
-`snapshotBackend` accumulates cell diffs into a char grid and its string form is
-checked with `expect`'s `ToBeSnapshot` against [testdata/](testdata/). On
+`TestBackend` ([internal/test/backend.go](internal/test/backend.go)) accumulates
+cell diffs into a char grid and its string form is checked with `expect`'s
+`ToBeSnapshot` against [testdata/](testdata/). On
 mismatch the test writes a `.current` file next to the snapshot for diffing;
 delete a snapshot file to regenerate it from the current rendering.
 

@@ -1,28 +1,19 @@
-package timui
+package timui_test
 
 import (
 	"strconv"
 	"testing"
 
 	"github.com/byte-wright/expect"
+	"github.com/byte-wright/timui"
+	"github.com/byte-wright/timui/internal/test"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
-type interactiveBackend struct {
-	size    mathi.Vec2
-	mouse   mathi.Vec2
-	pressed bool
-}
-
-func (b *interactiveBackend) Size() mathi.Vec2                             { return b.size }
-func (b *interactiveBackend) MousePosition() mathi.Vec2                    { return b.mouse }
-func (b *interactiveBackend) MousePressed(key Key) bool                    { return b.pressed }
-func (b *interactiveBackend) Set(pos mathi.Vec2, char rune, fg, bg uint32) {}
-func (b *interactiveBackend) Render()                                      {}
-
 func TestDropdownOverlaySelectsItem(t *testing.T) {
-	be := &interactiveBackend{size: mathi.Vec2{X: 30, Y: 15}, mouse: mathi.Vec2{X: 5, Y: 0}}
-	tui := New(be)
+	be := test.NewBackend(30, 15)
+	be.Mouse = mathi.Vec2{X: 5, Y: 0}
+	tui := timui.New(be)
 
 	selected := 0
 	frame := func() {
@@ -35,16 +26,16 @@ func TestDropdownOverlaySelectsItem(t *testing.T) {
 	// hover, press, release, and let the widget observe the release
 	click := func() {
 		frame()
-		be.pressed = true
+		be.Pressed = true
 		frame()
-		be.pressed = false
+		be.Pressed = false
 		frame()
 		frame()
 	}
 
 	click() // on the collapsed row: opens the overlay
 
-	be.mouse = mathi.Vec2{X: 5, Y: 4} // third item row inside the deferred overlay
+	be.Mouse = mathi.Vec2{X: 5, Y: 4} // third item row inside the deferred overlay
 	click()
 
 	expect.Value(t, "selected item", selected).ToBe(2)
