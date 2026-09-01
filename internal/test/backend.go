@@ -18,6 +18,7 @@ type TestBackend struct {
 	chars   [][]rune
 	Mouse   mathi.Vec2
 	Pressed bool
+	Input   timui.Input
 }
 
 func New(t *testing.T, width, height int) (*timui.Timui, *TestBackend) {
@@ -42,7 +43,15 @@ func New(t *testing.T, width, height int) (*timui.Timui, *TestBackend) {
 func (b *TestBackend) Size() mathi.Vec2                { return b.size }
 func (b *TestBackend) MousePosition() mathi.Vec2       { return b.Mouse }
 func (b *TestBackend) MousePressed(key timui.Key) bool { return b.Pressed }
-func (b *TestBackend) Render()                         {}
+
+func (b *TestBackend) TakeInput() timui.Input {
+	input := b.Input
+	b.Input = timui.Input{}
+
+	return input
+}
+
+func (b *TestBackend) Render() {}
 
 func (b *TestBackend) Set(pos mathi.Vec2, char rune, fg, bg uint32) {
 	if char != 0 {

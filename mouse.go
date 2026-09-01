@@ -13,6 +13,9 @@ type MouseInput struct {
 	leftPressed    bool
 	leftPressCount int
 	leftReleased   bool
+
+	wheel        mathi.Vec2
+	pendingWheel mathi.Vec2
 }
 
 type mouseInputManager struct {
@@ -62,6 +65,9 @@ func (t *Timui) MouseInputForArea(id string, area mathi.Box2) *MouseInput {
 		mouseInput.leftPressCount = 0
 	}
 
+	mouseInput.wheel = mouseInput.pendingWheel
+	mouseInput.pendingWheel = mathi.Vec2{}
+
 	mouseInput.area = area.Translate(t.CurrentArea().From)
 	mousePos := t.backend.MousePosition()
 	if mouseInput.area.Contains(mousePos) && t.PeekClip().Contains(mousePos) {
@@ -87,6 +93,12 @@ func (m *MouseInput) LeftReleased() bool {
 	return m.leftReleased
 }
 
+// Wheel is the wheel movement that happened over this area since the previous
+// frame. Y is positive when scrolling down.
+func (m *MouseInput) Wheel() mathi.Vec2 {
+	return m.wheel
+}
+
 func newMouseInputManager() *mouseInputManager {
 	return &mouseInputManager{
 		lastInputs: map[internal.ID]*MouseInput{},
@@ -94,11 +106,12 @@ func newMouseInputManager() *mouseInputManager {
 	}
 }
 
-func (m *mouseInputManager) finish(g *Timui) {
+func (m *mouseInputManager) finish(g *Timui, wheel mathi.Vec2) {
 	m.lastUnderCursor = m.underCursor
 
 	if m.underCursor != nil {
 		m.underCursor.hovered = true
+		m.underCursor.pendingWheel = m.underCursor.pendingWheel.Add(wheel)
 
 		if g.backend.MousePressed(MouseButtonLeft) {
 			m.underCursor.leftPressed = true

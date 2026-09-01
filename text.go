@@ -22,7 +22,14 @@ func (t *Timui) Label(name string) {
 	t.moveCursor(mathi.Vec2{Y: 1})
 }
 
+// cutText shortens text to width, marking the cut with an ellipsis. A cell that
+// was squeezed out of the layout has a negative width, which is nothing rather
+// than a reason to panic.
 func cutText(text string, width int) string {
+	if width <= 0 {
+		return ""
+	}
+
 	runes := []rune(text)
 
 	if len(runes) <= width {
@@ -37,6 +44,10 @@ func cutText(text string, width int) string {
 }
 
 func cutTextAndPad(text string, width int) string {
+	if width <= 0 {
+		return ""
+	}
+
 	runes := []rune(text)
 
 	if len(runes) == width {

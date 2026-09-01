@@ -59,6 +59,10 @@ func main() {
 		time.Sleep(time.Millisecond * 33)
 
 		render(tui)
+
+		if tui.KeyPressed(timui.KeyEscape) {
+			return
+		}
 	}
 }
 
@@ -69,7 +73,7 @@ func render(tui *timui.Timui) {
 				header(tui)
 			},
 			func(cell *timui.GridCell) {
-				cell.Columns(timui.Split().Fixed(12, 25, 12, 12, 12).Factor(0.3, 0.3),
+				cell.Columns(timui.Split().Fixed(12, 25, 12, 12, 12).Factor(0.3, 0.3, 0.3),
 					func(*timui.GridCell) {
 						countButtons(tui)
 					},
@@ -111,6 +115,9 @@ func render(tui *timui.Timui) {
 					func(*timui.GridCell) {
 						scrollable(tui)
 					},
+					func(*timui.GridCell) {
+						scrollList(tui)
+					},
 				)
 			},
 			func(cell *timui.GridCell) {
@@ -130,6 +137,29 @@ func render(tui *timui.Timui) {
 	})
 
 	tui.Finish()
+}
+
+var logState = timui.ScrollState{Follow: true}
+
+// scrollList shows a list far too long to draw in full, only the visible rows are
+// ever painted.
+func scrollList(tui *timui.Timui) {
+	for _, k := range tui.Keys() {
+		switch k.Key {
+		case timui.KeyPageUp:
+			logState.PageUp()
+		case timui.KeyPageDown:
+			logState.PageDown()
+		case timui.KeyHome:
+			logState.Top()
+		case timui.KeyEnd:
+			logState.Bottom()
+		}
+	}
+
+	tui.ScrollListV("loglist", &logState, 100000, func(i int) {
+		tui.Label(fmt.Sprintf("row %05d", i))
+	})
 }
 
 var pos = mathi.Vec2{}
@@ -253,5 +283,6 @@ func header(tui *timui.Timui) {
 
 func footer(tui *timui.Timui) {
 	s := tui.Size()
-	tui.Label(fmt.Sprintf("I'm the Foooter! %v/%v", s.X, s.Y))
+	tui.Label(fmt.Sprintf("I'm the Foooter! %v/%v  row %v follow %v",
+		s.X, s.Y, logState.Offset, logState.Follow))
 }

@@ -16,7 +16,8 @@ Self-described pet project / experiment. ~2,500 LOC of non-test Go.
 - Build: `go build ./...`
 - Test: `go test ./...`
 - Vet / format: `go vet ./...`, `gofmt -l .`
-- Run the demo: `go run ./cmd/example` (mouse-driven; Esc or Ctrl-C to quit)
+- Run the demo: `go run ./cmd/example` (mouse and wheel driven; Esc or Ctrl-C to
+  quit, PgUp/PgDn/Home/End drive the scroll list)
 
 Stdout/stderr are redirected to `stdout.log` / `stderr.log` in the working dir
 while the demo runs (see [util/redirstd.go](util/redirstd.go)), because the TUI
@@ -40,6 +41,14 @@ event-driven redraw; the caller drives a loop (the demo polls at ~30fps).
 **Backend seam.** The core has no tcell dependency. Everything the renderer needs
 is the 6-method `Backend` interface in [timui.go](timui.go); [tcell/](tcell/) is a
 thin adapter. Keep new rendering/input concerns behind this interface.
+
+**Input.** Level state (mouse position, buttons) is polled through `Backend`.
+Edge state (wheel notches, key presses) is drained once per frame with
+`Backend.TakeInput` in `finish` ([input.go](input.go)). Wheel movement is
+dispatched like hover, to whatever `MouseInput` area was last registered under the
+cursor, and read with `MouseInput.Wheel` on the following frame. Keys have no
+focus model: `Timui.Keys` / `KeyPressed` / `RunePressed` hand every widget the
+whole frame's presses and each decides what it cares about.
 
 **Area stack.** Layout is a stack of `mathi.Box2` regions. Widgets draw into
 `CurrentArea` and advance a cursor via `moveCursor`. Splits, grids, rows,
@@ -81,6 +90,21 @@ existing glyph, only update color."
   one cell closure per split entry (`Rows(split, cells ...func())`); panics on a
   cell/split count mismatch.
 
+## Scrolling
+
+Two widgets, sharing the bar drawing in `scrollBarV` ([scrollarea.go](scrollarea.go)):
+
+- `ScrollAreaV` draws all of its content into a translated area and clips it. Its
+  cost grows with the content, so it suits a page of widgets.
+- `ScrollListV` ([scrolllist.go](scrolllist.go)) takes a row count and a callback
+  and only calls it for visible rows, so a hundred thousand rows cost a screenful.
+  Position lives in a caller owned `ScrollState`, whose `Follow` tails the end of
+  the list until the user scrolls away from it.
+
+The bar only writes the position back while its knob is dragged. Knob positions
+are whole rows, so feeding them back every frame would snap away finer movement
+such as a single wheel notch.
+
 ## Conventions
 
 - No comments unless they explain a non-obvious *why*. Names carry the meaning.
@@ -89,9 +113,13 @@ existing glyph, only update color."
 
 ## Known issues & gotchas
 
-- **Keyboard input is unimplemented.** The `Backend` interface has no key events;
-  tcell only reads Esc/Ctrl-C. Everything is mouse-only — no text field, no focus
-  or tab navigation. This is the largest gap (see roadmap "# 2" in [todo.md](todo.md)).
+- **There is no focus model.** Key presses are delivered to every widget at once,
+  so two widgets reading the same key both act on it. Enough for shortcuts and for
+  a screen with one scrollable thing, not enough for a text field or tab
+  navigation (see roadmap "# 2" in [todo.md](todo.md)).
+- **Ctrl-C is the only exit the tcell backend handles.** Escape is delivered as an
+  ordinary key, so an app that wants to quit on it checks
+  `tui.KeyPressed(timui.KeyEscape)` itself, like the demo does.
 
 ## Roadmap
 

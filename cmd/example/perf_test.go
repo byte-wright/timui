@@ -13,6 +13,10 @@ func (n *nopBackend) MousePosition() mathi.Vec2 {
 	return mathi.Vec2{X: 15, Y: 3}
 }
 
+func (n *nopBackend) TakeInput() timui.Input {
+	return timui.Input{}
+}
+
 func (n *nopBackend) MousePressed(key timui.Key) bool {
 	return false
 }

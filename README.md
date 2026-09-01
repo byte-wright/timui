@@ -27,6 +27,19 @@ are rendered using function calls like:
     tui.Checkbox("Alpha", &checkedA)
 
 
+Input
+-----
+
+Mouse position and buttons are polled, wheel notches and key presses are
+collected by the backend and drained once per frame. The wheel goes to the area
+under the cursor, keys go to every widget because there is no focus model yet.
+
+    for _, k := range tui.Keys() {
+      if k.Key == timui.KeyPageUp {
+        state.PageUp()
+      }
+    }
+
 Backends
 --------
 

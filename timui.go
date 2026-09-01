@@ -14,6 +14,8 @@ type Timui struct {
 
 	after []func()
 
+	keys []KeyEvent
+
 	id                internal.IDManager
 	clipManager       clipManager
 	mouseInputManager mouseInputManager
@@ -35,6 +37,11 @@ type Backend interface {
 	Size() mathi.Vec2
 	MousePosition() mathi.Vec2
 	MousePressed(key Key) bool
+
+	// TakeInput returns the wheel movement and key presses collected since the
+	// previous call and clears them, so nothing is delivered twice.
+	TakeInput() Input
+
 	Set(pos mathi.Vec2, char rune, fg, bg uint32)
 	Render()
 }
@@ -104,7 +111,12 @@ func (t *Timui) finish() {
 	t.area = t.area[:0]
 	t.area = append(t.area, mathi.Box2{To: t.backend.Size()})
 
-	t.mouseInputManager.finish(t)
+	// taken unconditionally, so wheel movement over nothing is dropped instead of
+	// piling up until something is hovered
+	input := t.backend.TakeInput()
+	t.keys = input.Keys
+
+	t.mouseInputManager.finish(t, input.Wheel)
 	t.dropdownManager.finish(t)
 	t.draggableManager.finish(t)
 	t.scrollAreaManager.finish()

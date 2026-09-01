@@ -76,3 +76,21 @@ func TestGridLeavesSplitOptionsUntouched(t *testing.T) {
 
 	expect.Value(t, "split entries after use", split.NumSplitsForTest()).ToBe(2)
 }
+
+func TestWidgetsSurviveATooNarrowGrid(t *testing.T) {
+	tui, _ := test.New(t, 1, 4)
+
+	checked := true
+
+	// the grid pads a one column area on both sides, leaving its content a
+	// negative width
+	tui.Grid(func(grid *timui.Grid) {
+		grid.Rows(timui.Split().Factor(1, 1, 1),
+			func(*timui.GridCell) { tui.Label("label") },
+			func(*timui.GridCell) { tui.Checkbox("checkbox", &checked) },
+			func(*timui.GridCell) { tui.Button("button") },
+		)
+	})
+
+	tui.Finish()
+}

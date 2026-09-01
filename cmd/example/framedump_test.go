@@ -29,6 +29,7 @@ func newRecordBackend() *recordBackend {
 func (n *recordBackend) MousePosition() mathi.Vec2 { return mathi.Vec2{X: 15, Y: 3} }
 
 func (n *recordBackend) MousePressed(key timui.Key) bool { return false }
+func (n *recordBackend) TakeInput() timui.Input          { return timui.Input{} }
 
 func (n *recordBackend) Render() {}
 

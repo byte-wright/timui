@@ -10,6 +10,8 @@
 - widget style stacks?
 
 # 2
+- key events + mouse wheel [OK]
+- virtual scroll list [OK]
 - tab navigation/focus/input tree
 - keyboard navigation
 - shortcuts
