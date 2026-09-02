@@ -47,6 +47,7 @@ func (b *TestBackend) MousePressed(key timui.Key) bool { return b.Pressed }
 func (b *TestBackend) TakeInput() timui.Input {
 	input := b.Input
 	b.Input = timui.Input{}
+	b.Input.Mods = input.Mods
 
 	return input
 }

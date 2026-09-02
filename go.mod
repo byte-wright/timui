@@ -6,6 +6,7 @@ require (
 	github.com/byte-wright/expect v0.13.0
 	github.com/gdamore/tcell/v2 v2.7.4
 	gitlab.com/bytewright/gmath v0.22.0
+	go.rockorager.dev/vaxis v0.17.1
 )
 
 require (
@@ -15,6 +16,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
+	github.com/rockorager/go-uucode v1.2.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b // indirect
 	golang.org/x/sys v0.17.0 // indirect

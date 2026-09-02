@@ -13,6 +13,7 @@ type TCellBackend struct {
 	leftMouse  bool
 	rightMouse bool
 	input      timui.Input
+	mods       timui.ModMask
 }
 
 func NewBackend() (*TCellBackend, error) {
@@ -56,6 +57,7 @@ func (b *TCellBackend) MousePosition() mathi.Vec2 {
 func (b *TCellBackend) TakeInput() timui.Input {
 	input := b.input
 	b.input = timui.Input{}
+	input.Mods = b.mods
 
 	return input
 }
@@ -80,6 +82,8 @@ func (b *TCellBackend) Events() bool {
 
 		switch evt := ev.(type) {
 		case *tcell.EventKey:
+			b.mods = mapMods(evt.Modifiers())
+
 			if evt.Key() == tcell.KeyCtrlC {
 				exit = true
 			}
@@ -90,6 +94,8 @@ func (b *TCellBackend) Events() bool {
 			}
 
 		case *tcell.EventMouse:
+			b.mods = mapMods(evt.Modifiers())
+
 			x, y := evt.Position()
 			b.mousePos = mathi.Vec2{X: x, Y: y}
 
@@ -103,6 +109,26 @@ func (b *TCellBackend) Events() bool {
 	}
 
 	return exit
+}
+
+// mapMods translates tcell's modifier mask. Only the modifiers timui knows are
+// kept, the rest, like meta, are dropped.
+func mapMods(mask tcell.ModMask) timui.ModMask {
+	mods := timui.ModMask(0)
+
+	if mask&tcell.ModShift != 0 {
+		mods |= timui.ModShift
+	}
+
+	if mask&tcell.ModCtrl != 0 {
+		mods |= timui.ModCtrl
+	}
+
+	if mask&tcell.ModAlt != 0 {
+		mods |= timui.ModAlt
+	}
+
+	return mods
 }
 
 // wheelDelta reads the wheel bits out of a button mask. tcell reports wheel

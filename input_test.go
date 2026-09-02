@@ -26,3 +26,25 @@ func TestKeysArriveOnTheNextFrame(t *testing.T) {
 
 	expect.Value(t, "keys are not repeated", len(tui.Keys())).ToBe(0)
 }
+
+func TestModifiersStayUntilTheyChange(t *testing.T) {
+	tui, be := test.New(t, 20, 5)
+
+	be.Input.Mods = timui.ModCtrl | timui.ModShift
+
+	tui.Finish()
+
+	expect.Value(t, "ctrl", tui.Mods().Has(timui.ModCtrl)).ToBe(true)
+	expect.Value(t, "ctrl and shift", tui.Mods().Has(timui.ModCtrl|timui.ModShift)).ToBe(true)
+	expect.Value(t, "alt", tui.Mods().Has(timui.ModAlt)).ToBe(false)
+
+	// unlike keys a modifier is a state, nothing reports that it was let go
+	tui.Finish()
+
+	expect.Value(t, "still ctrl", tui.Mods().Has(timui.ModCtrl)).ToBe(true)
+
+	be.Input.Mods = 0
+	tui.Finish()
+
+	expect.Value(t, "released", tui.Mods().Has(timui.ModCtrl)).ToBe(false)
+}

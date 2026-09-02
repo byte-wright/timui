@@ -48,7 +48,11 @@ Edge state (wheel notches, key presses) is drained once per frame with
 dispatched like hover, to whatever `MouseInput` area was last registered under the
 cursor, and read with `MouseInput.Wheel` on the following frame. Keys have no
 focus model: `Timui.Keys` / `KeyPressed` / `RunePressed` hand every widget the
-whole frame's presses and each decides what it cares about.
+whole frame's presses and each decides what it cares about. Modifiers
+(`Timui.Mods`, a `ModMask` of `ModShift`/`ModCtrl`/`ModAlt`) ride along on
+`Input` as state and survive `TakeInput`. The backend keeps them current: the
+vaxis backend sees a lone modifier press/release through the kitty keyboard
+protocol, the tcell backend only when the terminal reports another event.
 
 **Area stack.** Layout is a stack of `mathi.Box2` regions. Widgets draw into
 `CurrentArea` and advance a cursor via `moveCursor`. Splits, grids, rows,

@@ -15,6 +15,7 @@ type Timui struct {
 	after []func()
 
 	keys []KeyEvent
+	mods ModMask
 
 	id                internal.IDManager
 	clipManager       clipManager
@@ -39,7 +40,8 @@ type Backend interface {
 	MousePressed(key Key) bool
 
 	// TakeInput returns the wheel movement and key presses collected since the
-	// previous call and clears them, so nothing is delivered twice.
+	// previous call and clears them, so nothing is delivered twice. The modifier
+	// state it carries is not cleared, it is the currently held state.
 	TakeInput() Input
 
 	Set(pos mathi.Vec2, char rune, fg, bg uint32)
@@ -115,6 +117,7 @@ func (t *Timui) finish() {
 	// piling up until something is hovered
 	input := t.backend.TakeInput()
 	t.keys = input.Keys
+	t.mods = input.Mods
 
 	t.mouseInputManager.finish(t, input.Wheel)
 	t.dropdownManager.finish(t)

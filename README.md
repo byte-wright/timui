@@ -1,18 +1,16 @@
-TIMUI
-=====
+# TIMUI
 
 **Disclaimer:** This is a personal pet project / experiment
 
 is a terminal ui immediate mode user interface library.
 inspired by https://github.com/ocornut/imgui
 
-Focus
------
+## Focus
+
 - simple
 - lightweight
 
-Widgets
--------
+## Widgets
 
 are rendered using function calls like:
 
@@ -26,13 +24,15 @@ are rendered using function calls like:
 
     tui.Checkbox("Alpha", &checkedA)
 
-
-Input
------
+## Input
 
 Mouse position and buttons are polled, wheel notches and key presses are
 collected by the backend and drained once per frame. The wheel goes to the area
 under the cursor, keys go to every widget because there is no focus model yet.
+`tui.Mods()` reports the modifiers currently held, which makes ctrl-clicks and
+ctrl-hovers possible. The vaxis backend tracks them through the kitty keyboard
+protocol, so a lone Ctrl press is seen; the tcell backend only sees modifiers
+when another event is reported.
 
     for _, k := range tui.Keys() {
       if k.Key == timui.KeyPageUp {
@@ -40,14 +40,13 @@ under the cursor, keys go to every widget because there is no focus model yet.
       }
     }
 
-Backends
---------
+## Backends
 
 The manipulating of the terminal and event handling is done via backends.
 
-Currently there is a github.com/gdamore/tcell backend.
+Currently there is a github.com/gdamore/tcell backend and a
+go.rockorager.dev/vaxis backend.
 
-Example
--------
+## Example
 
 ![Demo](cmd/example/demo.gif)

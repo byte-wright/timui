@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"github.com/byte-wright/timui"
 	"github.com/byte-wright/timui/tcell"
 	"github.com/byte-wright/timui/util"
+	"github.com/byte-wright/timui/vaxis"
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
@@ -23,6 +25,14 @@ var (
 	dialogA   bool
 )
 
+// terminalBackend is the timui Backend plus the lifecycle the demo drives
+// directly: draining events and restoring the terminal on exit.
+type terminalBackend interface {
+	timui.Backend
+	Events() bool
+	Exit()
+}
+
 func main() {
 	restore, err := util.RedirectStdToFiles()
 	if err != nil {
@@ -30,9 +40,25 @@ func main() {
 	}
 	defer restore.Restore()
 
-	backend, err := tcell.NewBackend()
-	if err != nil {
-		log.Fatal(err)
+	backendName := flag.String("backend", "tcell", "terminal backend: tcell or vaxis")
+	flag.Parse()
+
+	var backend terminalBackend
+	switch *backendName {
+	case "tcell":
+		tcellBackend, err := tcell.NewBackend()
+		if err != nil {
+			log.Fatal(err)
+		}
+		backend = tcellBackend
+	case "vaxis":
+		vaxisBackend, err := vaxis.NewBackend()
+		if err != nil {
+			log.Fatal(err)
+		}
+		backend = vaxisBackend
+	default:
+		log.Fatalf("unknown backend %q", *backendName)
 	}
 
 	tui := timui.New(backend)

@@ -11,6 +11,27 @@ type Input struct {
 
 	// Keys are the presses in the order they arrived.
 	Keys []KeyEvent
+
+	// Mods are the modifiers currently held. It is a state and not an event, so
+	// it survives being read.
+	Mods ModMask
+}
+
+// ModMask is a set of modifier keys. Backends track the currently held state:
+// the vaxis backend sees a modifier pressed or let go on its own through the
+// kitty keyboard protocol. On a backend that can't report those (tcell), the
+// modifiers only change when the mouse moves or a key is typed.
+type ModMask int
+
+const (
+	ModShift ModMask = 1 << iota
+	ModCtrl
+	ModAlt
+)
+
+// Has reports whether every modifier in o is set.
+func (m ModMask) Has(o ModMask) bool {
+	return m&o == o
 }
 
 // KeyEvent is a single key press. For printable characters Key is KeyRune and Rune
@@ -43,6 +64,11 @@ const (
 // anything to it.
 func (t *Timui) Keys() []KeyEvent {
 	return t.keys
+}
+
+// Mods returns the modifiers currently held.
+func (t *Timui) Mods() ModMask {
+	return t.mods
 }
 
 // KeyPressed reports whether the given key was pressed this frame.

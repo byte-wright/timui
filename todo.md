@@ -11,6 +11,7 @@
 
 # 2
 - key events + mouse wheel [OK]
+- modifier keys [OK]
 - virtual scroll list [OK]
 - tab navigation/focus/input tree
 - keyboard navigation
