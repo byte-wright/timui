@@ -18,11 +18,13 @@ func (g *Timui) Columns(opts *SplitOptions, cells ...func()) {
 		cellArea.From.X = area.From.X + positions[i].from
 		cellArea.To.X = area.From.X + positions[i].to
 
-		g.WithArea(cellArea, func() {
-			cell()
-			if g.CurrentArea().From.Y > maxCursor {
-				maxCursor = g.CurrentArea().From.Y
-			}
+		g.WithCopyRect(cellArea, func() {
+			g.WithArea(cellArea, func() {
+				cell()
+				if g.CurrentArea().From.Y > maxCursor {
+					maxCursor = g.CurrentArea().From.Y
+				}
+			})
 		})
 	}
 

@@ -24,6 +24,9 @@ func (n *nopBackend) MousePressed(key timui.Key) bool {
 func (n *nopBackend) Render() {
 }
 
+func (n *nopBackend) WriteClipboard(text string) {
+}
+
 func (n *nopBackend) Set(pos mathi.Vec2, char rune, fg uint32, bg uint32) {
 }
 

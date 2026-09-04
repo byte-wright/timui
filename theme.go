@@ -7,7 +7,13 @@ type Theme struct {
 	BorderBG    RGBColor
 	Widget      WidgetTheme
 	ScrollBar   ScrollBarTheme
+	Selection   SelectionTheme
 	BorderStyle BorderStyle
+}
+
+type SelectionTheme struct {
+	Text RGBColor
+	BG   RGBColor
 }
 
 type WidgetTheme struct {
@@ -52,6 +58,10 @@ var DefaultTheme = Theme{
 		ArrowBG: MustRGBS("#135"),
 		Knob:    MustRGBS("#46f"),
 		KnobBG:  MustRGBS("#00a"),
+	},
+	Selection: SelectionTheme{
+		Text: MustRGBS("#000"),
+		BG:   MustRGBS("#5af"),
 	},
 	BorderStyle: BorderDouble,
 }

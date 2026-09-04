@@ -41,18 +41,23 @@ func (g *Timui) ScrollAreaV(id string, body func()) {
 
 	g.WithArea(area, func() {
 		g.WithClip(area, func() {
-			g.WithAreaTranslation(mathi.Vec2{Y: -int(float32(overflow) * scrollArea.factor)}, func() {
-				topY := g.CurrentArea().From.Y
+			g.WithCopyRect(area, func() {
+				g.WithAreaTranslation(mathi.Vec2{Y: -int(float32(overflow) * scrollArea.factor)}, func() {
+					topY := g.CurrentArea().From.Y
 
-				body()
+					body()
 
-				scrollArea.contentHeight = g.CurrentArea().From.Y - topY
+					scrollArea.contentHeight = g.CurrentArea().From.Y - topY
+				})
 			})
 		})
 	})
 
 	g.WithArea(area, func() {
-		wheel := g.MouseInput("wheel").Wheel()
+		wheelInput := g.MouseInput("wheel")
+		wheelInput.passive = true
+
+		wheel := wheelInput.Wheel()
 		if wheel.Y != 0 && overflow > 0 {
 			scrollArea.factor = clampFactor(scrollArea.factor +
 				float32(wheel.Y*wheelStep)/float32(overflow))

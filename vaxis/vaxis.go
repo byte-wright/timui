@@ -74,6 +74,10 @@ func (b *VaxisBackend) TakeInput() timui.Input {
 	return input
 }
 
+func (b *VaxisBackend) WriteClipboard(text string) {
+	b.vx.ClipboardPush(text)
+}
+
 func (b *VaxisBackend) MousePressed(key timui.Key) bool {
 	if key == timui.MouseButtonLeft {
 		return b.leftMouse

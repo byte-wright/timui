@@ -1,6 +1,10 @@
 package tcell
 
 import (
+	"encoding/base64"
+	"fmt"
+	"os"
+
 	"github.com/byte-wright/timui"
 	"github.com/gdamore/tcell/v2"
 	_ "github.com/gdamore/tcell/v2/encoding"
@@ -52,6 +56,21 @@ func (b *TCellBackend) Render() {
 
 func (b *TCellBackend) MousePosition() mathi.Vec2 {
 	return b.mousePos
+}
+
+// WriteClipboard sends an OSC 52 escape sequence directly to the controlling
+// tty. tcell's Screen interface has no raw-write hook and stdout is normally
+// redirected to a log file (the TUI owns the terminal), so /dev/tty is opened
+// fresh for this one write rather than going through either.
+func (b *TCellBackend) WriteClipboard(text string) {
+	tty, err := os.OpenFile("/dev/tty", os.O_WRONLY, 0)
+	if err != nil {
+		return
+	}
+	defer tty.Close()
+
+	b64 := base64.StdEncoding.EncodeToString([]byte(text))
+	fmt.Fprintf(tty, "\x1b]52;c;%s\x1b\\", b64)
 }
 
 func (b *TCellBackend) TakeInput() timui.Input {

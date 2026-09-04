@@ -83,9 +83,12 @@ func (t *Timui) gridSplit(a gridAxis, area mathi.Box2, opts *SplitOptions, cells
 
 		cellArea := a.cellArea(area, positions[i*2+1])
 		c := &GridCell{t: t, area: a.expand(cellArea, 1)}
+		content := a.crossPad(cellArea, 1)
 
-		t.WithArea(a.crossPad(cellArea, 1), func() {
-			cell(c)
+		t.WithCopyRect(content, func() {
+			t.WithArea(content, func() {
+				cell(c)
+			})
 		})
 	}
 }

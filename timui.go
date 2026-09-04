@@ -19,10 +19,12 @@ type Timui struct {
 
 	id                internal.IDManager
 	clipManager       clipManager
+	copyRectManager   copyRectManager
 	mouseInputManager mouseInputManager
 	dropdownManager   dropdownManager
 	draggableManager  draggableManager
 	scrollAreaManager scrollAreaManager
+	selectionManager  selectionManager
 
 	Theme Theme
 }
@@ -46,6 +48,11 @@ type Backend interface {
 
 	Set(pos mathi.Vec2, char rune, fg, bg uint32)
 	Render()
+
+	// WriteClipboard pushes text to the system clipboard, typically via an OSC 52
+	// escape sequence so it also works over SSH without a helper binary on the
+	// remote end.
+	WriteClipboard(text string)
 }
 
 func New(backend Backend) *Timui {
@@ -62,10 +69,12 @@ func New(backend Backend) *Timui {
 		area:              []mathi.Box2{},
 		id:                *internal.NewIDManager(),
 		clipManager:       *newClipManager(),
+		copyRectManager:   *newCopyRectManager(),
 		mouseInputManager: *newMouseInputManager(),
 		dropdownManager:   *newDropdownManager(),
 		draggableManager:  *newDraggableManager(),
 		scrollAreaManager: *newScrollAreaManager(),
+		selectionManager:  *newSelectionManager(),
 
 		Theme: DefaultTheme,
 	}
@@ -85,6 +94,11 @@ func (t *Timui) Finish() {
 	for i := 0; i < len(t.after); i++ {
 		t.after[i]()
 	}
+
+	// runs after every widget and overlay so the drag gesture sees this frame's
+	// full picture, and so the highlight it draws sits on top of everything
+	t.selectionManager.update(t)
+	t.selectionManager.draw(t)
 
 	for i := range t.front.Chars {
 		fc := t.front.Chars[i]

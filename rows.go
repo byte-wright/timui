@@ -17,6 +17,8 @@ func (g *Timui) Rows(opts *SplitOptions, cells ...func()) {
 		cellArea.From.Y = yStart + positions[i].from
 		cellArea.To.Y = yStart + positions[i].to
 
-		g.WithArea(cellArea, cell)
+		g.WithCopyRect(cellArea, func() {
+			g.WithArea(cellArea, cell)
+		})
 	}
 }

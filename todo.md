@@ -5,6 +5,7 @@
 - modal dialog [OK]
 - drag and drop [OK]
 - scrollbars [OK]
+- text selection + clipboard copy (OSC 52) [OK]
 - textinputfield
 - split area resize
 - widget style stacks?

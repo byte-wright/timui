@@ -33,6 +33,8 @@ func (n *recordBackend) TakeInput() timui.Input          { return timui.Input{} 
 
 func (n *recordBackend) Render() {}
 
+func (n *recordBackend) WriteClipboard(text string) {}
+
 func (n *recordBackend) Set(pos mathi.Vec2, char rune, fg uint32, bg uint32) {
 	if char != 0 {
 		n.chars[pos.Y][pos.X] = char

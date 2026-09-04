@@ -42,6 +42,12 @@ func (s *Screen) Get(pos mathi.Vec2) cell {
 	return s.Chars[i]
 }
 
+// GetChar returns the character painted at pos, or 0 if it is out of bounds or
+// was never drawn.
+func (s *Screen) GetChar(pos mathi.Vec2) rune {
+	return s.Get(pos).Char
+}
+
 // set paints the character, foreground and background
 // if the character is 0 the character will not be updated, old one remains.
 // colors are blended when transparent.

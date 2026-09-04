@@ -13,12 +13,13 @@ import (
 // TestBackend accumulates the pushed cell diffs like a real terminal, so
 // after any Finish its grid equals that frame's front buffer.
 type TestBackend struct {
-	t       *testing.T
-	size    mathi.Vec2
-	chars   [][]rune
-	Mouse   mathi.Vec2
-	Pressed bool
-	Input   timui.Input
+	t         *testing.T
+	size      mathi.Vec2
+	chars     [][]rune
+	Mouse     mathi.Vec2
+	Pressed   bool
+	Input     timui.Input
+	Clipboard string
 }
 
 func New(t *testing.T, width, height int) (*timui.Timui, *TestBackend) {
@@ -53,6 +54,8 @@ func (b *TestBackend) TakeInput() timui.Input {
 }
 
 func (b *TestBackend) Render() {}
+
+func (b *TestBackend) WriteClipboard(text string) { b.Clipboard = text }
 
 func (b *TestBackend) Set(pos mathi.Vec2, char rune, fg, bg uint32) {
 	if char != 0 {

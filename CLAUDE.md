@@ -39,7 +39,7 @@ resizes, clears the front buffer, and resets per-frame state. There is no
 event-driven redraw; the caller drives a loop (the demo polls at ~30fps).
 
 **Backend seam.** The core has no tcell dependency. Everything the renderer needs
-is the 6-method `Backend` interface in [timui.go](timui.go); [tcell/](tcell/) is a
+is the `Backend` interface in [timui.go](timui.go); [tcell/](tcell/) is a
 thin adapter. Keep new rendering/input concerns behind this interface.
 
 **Input.** Level state (mouse position, buttons) is polled through `Backend`.
@@ -75,6 +75,23 @@ different rows). Changing a widget's label changes its ID and drops its state.
 after the main pass. Z-order follows registration order in the `after` queue;
 a deferred callback may itself call `runAfter` (dropdown inside a dialog) and
 the nested overlay runs after — and thus above — its parent.
+
+**Text selection & clipboard.** There is no focus model, so — like dragging —
+only one selection can exist at a time; it's a single global gesture in
+[selection.go](selection.go), not per-widget state. A left-press that lands
+where no `MouseInput` claims it starts a drag; releasing over a non-empty
+selection copies it via `Backend.WriteClipboard` (OSC 52, so it works over SSH
+with no clipboard helper installed remotely). Rendering is the library's job,
+not the caller's: the highlight is painted directly in `Finish`, after the
+`after` queue, so it always sits on top. What a selection can reach is scoped by
+a second area-like stack, `CopyRect` ([copyrect.go](copyrect.go)) — pushed
+alongside `WithArea`/`WithClip` by Grid/Rows/Columns cells, `ScrollAreaV`,
+`ScrollListV`, and `Dialog` — so a drag starting inside one of those can't
+select past its edge; unscoped content falls back to the whole screen. A
+`MouseInput` that only cares about hover/wheel (a scrollarea's wheel catcher, a
+dialog's own click shield) sets its `passive` field so it keeps working
+normally but doesn't also block a selection from starting there — only a
+genuinely interactive widget should do that.
 
 **Color / alpha.** Colors are packed `uint32` (`RGBColor` / `RGBAColor` in
 [color.go](color.go)). The cell buffer blends alpha ([internal/screen.go](internal/screen.go)),

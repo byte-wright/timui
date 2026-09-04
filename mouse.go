@@ -10,6 +10,12 @@ type MouseInput struct {
 	hovered    bool
 	hoverCount int
 
+	// passive marks an area that only cares about hover/wheel, such as a
+	// scrollarea's wheel catcher or a dialog's own backdrop-click shield. It
+	// still participates in underCursor normally; it only tells selection not
+	// to treat this area as a widget claiming the click.
+	passive bool
+
 	leftPressed    bool
 	leftPressCount int
 	leftReleased   bool
@@ -97,6 +103,12 @@ func (m *MouseInput) LeftReleased() bool {
 // frame. Y is positive when scrolling down.
 func (m *MouseInput) Wheel() mathi.Vec2 {
 	return m.wheel
+}
+
+// selectionBlocked reports whether the current underCursor MouseInput should
+// stop a text selection from starting, i.e. there is one and it isn't passive.
+func (m *mouseInputManager) selectionBlocked() bool {
+	return m.underCursor != nil && !m.underCursor.passive
 }
 
 func newMouseInputManager() *mouseInputManager {

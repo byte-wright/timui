@@ -24,35 +24,40 @@ func (t *Timui) Dialog(title string, visible *bool, content func()) {
 			area.To = area.To.Mul(3).Div(4)
 
 			t.WithArea(area, func() {
-				t.MouseInput("dialog") // to cancel the modal backdrop close click
+				t.WithCopyRect(area, func() {
+					// claims the click so it doesn't also reach "modal" and close the
+					// dialog; passive so it doesn't also block selecting dialog content
+					dialogCatcher := t.MouseInput("dialog")
+					dialogCatcher.passive = true
 
-				t.Grid(func(grid *Grid) {
-					t.SetArea(' ', t.Theme.Text, t.Theme.BG)
+					t.Grid(func(grid *Grid) {
+						t.SetArea(' ', t.Theme.Text, t.Theme.BG)
 
-					grid.Rows(Split().Fixed(1).Factor(1),
-						func(cell *GridCell) {
-							cell.Columns(Split().Factor(1).Fixed(3),
-								func(*GridCell) {
-									t.Pad(0, 1, 0, 1, func() {
-										t.Label(title)
-									})
-								},
-								func(*GridCell) {
-									close := t.MouseInputForSize("close", mathi.Vec2{X: 3, Y: 1})
-									if close.LeftReleased() {
-										*visible = false
-									}
-									if close.Hovered() > 0 {
-										t.SetAreaAlpha(0, Transparent, RGBA(0x55, 0, 0, 0xff))
-									}
-									t.Label(" X ")
-								},
-							)
-						},
-						func(*GridCell) {
-							t.Pad(0, 1, 0, 1, content)
-						},
-					)
+						grid.Rows(Split().Fixed(1).Factor(1),
+							func(cell *GridCell) {
+								cell.Columns(Split().Factor(1).Fixed(3),
+									func(*GridCell) {
+										t.Pad(0, 1, 0, 1, func() {
+											t.Label(title)
+										})
+									},
+									func(*GridCell) {
+										close := t.MouseInputForSize("close", mathi.Vec2{X: 3, Y: 1})
+										if close.LeftReleased() {
+											*visible = false
+										}
+										if close.Hovered() > 0 {
+											t.SetAreaAlpha(0, Transparent, RGBA(0x55, 0, 0, 0xff))
+										}
+										t.Label(" X ")
+									},
+								)
+							},
+							func(*GridCell) {
+								t.Pad(0, 1, 0, 1, content)
+							},
+						)
+					})
 				})
 			})
 

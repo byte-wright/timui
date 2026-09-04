@@ -36,7 +36,10 @@ func (g *Timui) ScrollListV(id string, state *ScrollState, count int, row func(i
 	}
 
 	g.WithArea(area, func() {
-		wheel := g.MouseInput("wheel").Wheel()
+		wheelInput := g.MouseInput("wheel")
+		wheelInput.passive = true
+
+		wheel := wheelInput.Wheel()
 		if wheel.Y != 0 {
 			state.Offset += wheel.Y * wheelStep
 			state.Follow = state.Offset >= max
@@ -62,15 +65,17 @@ func (g *Timui) ScrollListV(id string, state *ScrollState, count int, row func(i
 
 	g.WithArea(listArea, func() {
 		g.WithClip(listArea, func() {
-			for i := 0; i < height && state.Offset+i < count; i++ {
-				rowArea := listArea
-				rowArea.From.Y = listArea.From.Y + i
-				rowArea.To.Y = rowArea.From.Y + 1
+			g.WithCopyRect(listArea, func() {
+				for i := 0; i < height && state.Offset+i < count; i++ {
+					rowArea := listArea
+					rowArea.From.Y = listArea.From.Y + i
+					rowArea.To.Y = rowArea.From.Y + 1
 
-				g.WithArea(rowArea, func() {
-					row(state.Offset + i)
-				})
-			}
+					g.WithArea(rowArea, func() {
+						row(state.Offset + i)
+					})
+				}
+			})
 		})
 	})
 }
