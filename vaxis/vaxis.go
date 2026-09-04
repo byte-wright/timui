@@ -74,8 +74,13 @@ func (b *VaxisBackend) TakeInput() timui.Input {
 	return input
 }
 
+// WriteClipboard pushes via OSC 52 and also tries a local clipboard tool as a
+// fallback: VTE-based terminals (GNOME Terminal, Guake, Tilix, ...) don't
+// support OSC 52 copy at all.
 func (b *VaxisBackend) WriteClipboard(text string) {
 	b.vx.ClipboardPush(text)
+
+	_ = timui.WriteClipboardLocal(text)
 }
 
 func (b *VaxisBackend) MousePressed(key timui.Key) bool {

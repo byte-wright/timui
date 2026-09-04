@@ -61,16 +61,18 @@ func (b *TCellBackend) MousePosition() mathi.Vec2 {
 // WriteClipboard sends an OSC 52 escape sequence directly to the controlling
 // tty. tcell's Screen interface has no raw-write hook and stdout is normally
 // redirected to a log file (the TUI owns the terminal), so /dev/tty is opened
-// fresh for this one write rather than going through either.
+// fresh for this one write rather than going through either. It also tries a
+// local clipboard tool as a fallback: VTE-based terminals (GNOME Terminal,
+// Guake, Tilix, ...) don't support OSC 52 copy at all.
 func (b *TCellBackend) WriteClipboard(text string) {
 	tty, err := os.OpenFile("/dev/tty", os.O_WRONLY, 0)
-	if err != nil {
-		return
+	if err == nil {
+		b64 := base64.StdEncoding.EncodeToString([]byte(text))
+		fmt.Fprintf(tty, "\x1b]52;c;%s\x1b\\", b64)
+		tty.Close()
 	}
-	defer tty.Close()
 
-	b64 := base64.StdEncoding.EncodeToString([]byte(text))
-	fmt.Fprintf(tty, "\x1b]52;c;%s\x1b\\", b64)
+	_ = timui.WriteClipboardLocal(text)
 }
 
 func (b *TCellBackend) TakeInput() timui.Input {
