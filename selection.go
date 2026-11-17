@@ -6,6 +6,11 @@ import (
 	"gitlab.com/bytewright/gmath/mathi"
 )
 
+// selectionDragThreshold is how many cells the mouse has to travel from the
+// press, on either axis, before a drag turns into a selection. Without it every
+// plain click would highlight and copy the cell under the cursor.
+const selectionDragThreshold = 2
+
 // selectionManager owns the one text selection that can exist at a time - there
 // is no focus model, so like draggableManager this is global rather than keyed
 // per widget. Its rendering is handled by the library (draw), callers never draw
@@ -25,9 +30,10 @@ func newSelectionManager() *selectionManager {
 
 // update runs once per frame after every widget (including deferred overlays)
 // has had a chance to register a MouseInput and a CopyRect for this frame's
-// mouse position. A press that lands where nothing claims the click starts a
-// selection scoped to the innermost CopyRect under it; releasing the button
-// copies a non-empty selection to the clipboard.
+// mouse position. A press that lands where nothing claims the click arms a
+// selection scoped to the innermost CopyRect under it, which becomes active once
+// the mouse has moved selectionDragThreshold cells away; releasing the button
+// copies a non-empty active selection to the clipboard.
 func (m *selectionManager) update(t *Timui) {
 	mousePos := t.backend.MousePosition()
 	pressed := t.backend.MousePressed(MouseButtonLeft)
@@ -37,8 +43,17 @@ func (m *selectionManager) update(t *Timui) {
 	case m.dragging:
 		m.current = mousePos
 
+		if !m.active {
+			d := m.current.Sub(m.anchor).Abs()
+			m.active = max(d.X, d.Y) >= selectionDragThreshold
+		}
+
 		if !pressed {
 			m.dragging = false
+
+			if !m.active {
+				break
+			}
 
 			if text := m.text(t); text != "" {
 				t.backend.WriteClipboard(text)
@@ -49,7 +64,7 @@ func (m *selectionManager) update(t *Timui) {
 
 	case pressed && !t.mouseInputManager.selectionBlocked():
 		m.dragging = true
-		m.active = true
+		m.active = false
 		m.rect = rect
 		m.anchor = mousePos
 		m.current = mousePos

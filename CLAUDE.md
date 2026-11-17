@@ -79,8 +79,9 @@ the nested overlay runs after — and thus above — its parent.
 **Text selection & clipboard.** There is no focus model, so — like dragging —
 only one selection can exist at a time; it's a single global gesture in
 [selection.go](selection.go), not per-widget state. A left-press that lands
-where no `MouseInput` claims it starts a drag; releasing over a non-empty
-selection copies it via `Backend.WriteClipboard` (OSC 52, so it works over SSH
+where no `MouseInput` claims it arms a drag, which only becomes a selection once
+the mouse has moved `selectionDragThreshold` (2) cells on either axis, so a plain
+click neither highlights nor copies; releasing over a non-empty selection copies it via `Backend.WriteClipboard` (OSC 52, so it works over SSH
 with no clipboard helper installed remotely). Rendering is the library's job,
 not the caller's: the highlight is painted directly in `Finish`, after the
 `after` queue, so it always sits on top. What a selection can reach is scoped by

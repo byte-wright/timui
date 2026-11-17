@@ -89,3 +89,30 @@ func TestSelectionIsScopedToItsColumn(t *testing.T) {
 
 	expect.Value(t, "clipboard", be.Clipboard).ToBe("Left side text")
 }
+
+func TestSelectionIgnoresAClickThatBarelyMoves(t *testing.T) {
+	tui, be := test.New(t, 30, 5)
+
+	frame := func() {
+		tui.Label("Hello, World")
+		tui.Label("Second row")
+		tui.Finish()
+	}
+
+	drag(be, frame, mathi.Vec2{X: 2, Y: 0}, mathi.Vec2{X: 3, Y: 1})
+
+	expect.Value(t, "clipboard", be.Clipboard).ToBe("")
+}
+
+func TestSelectionStartsOnceTheThresholdIsReached(t *testing.T) {
+	tui, be := test.New(t, 30, 5)
+
+	frame := func() {
+		tui.Label("Hello, World")
+		tui.Finish()
+	}
+
+	drag(be, frame, mathi.Vec2{X: 0, Y: 0}, mathi.Vec2{X: 2, Y: 0})
+
+	expect.Value(t, "clipboard", be.Clipboard).ToBe("Hel")
+}

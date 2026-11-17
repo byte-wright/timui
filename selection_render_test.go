@@ -64,3 +64,36 @@ func TestSelectionHighlightsOnlySelectedCells(t *testing.T) {
 		t.Errorf("cell 4 is outside the drag but was painted with the selection highlight")
 	}
 }
+
+func TestSelectionHighlightIsClearedByAClick(t *testing.T) {
+	be := newRecordingBackend(mathi.Vec2{X: 10, Y: 3})
+	tui := New(be)
+
+	frame := func() {
+		tui.Label("ABCDEFGHI")
+		tui.Finish()
+	}
+
+	be.mouse = mathi.Vec2{X: 0, Y: 0}
+	frame()
+
+	be.pressed = true
+	frame()
+
+	be.mouse = mathi.Vec2{X: 3, Y: 0}
+	frame()
+
+	be.pressed = false
+	frame()
+
+	be.pressed = true
+	frame()
+
+	want := uint32(tui.Theme.Selection.BG)
+
+	for x := 0; x <= 3; x++ {
+		if got := be.bg[mathi.Vec2{X: x, Y: 0}]; got == want {
+			t.Errorf("cell %d is still highlighted after a click", x)
+		}
+	}
+}
